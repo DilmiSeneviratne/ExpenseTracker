@@ -3,32 +3,32 @@ import FeatureImage from "../Assests/features.jpg";
 const Features = () => {
   return (
     <>
-      <section class="bg-white dark:bg-gray-900">
-        <div class="container px-6 py-10 mx-auto">
-          <h1 class="text-2xl font-semibold text-gray-800 capitalize lg:text-3xl dark:text-white">
+      <section className="bg-white dark:bg-gray-900">
+        <div className="container px-6 py-10 mx-auto">
+          <h1 className="text-2xl font-semibold text-gray-800 capitalize lg:text-3xl dark:text-white">
             explore our <br /> awesome Features
           </h1>
 
-          <div class="mt-2">
-            <span class="inline-block w-40 h-1 bg-emerald-500 rounded-full"></span>
-            <span class="inline-block w-3 h-1 ml-1 bg-emerald-500 rounded-full"></span>
-            <span class="inline-block w-1 h-1 ml-1 bg-emerald-500 rounded-full"></span>
+          <div className="mt-2">
+            <span className="inline-block w-40 h-1 bg-emerald-500 rounded-full"></span>
+            <span className="inline-block w-3 h-1 ml-1 bg-emerald-500 rounded-full"></span>
+            <span className="inline-block w-1 h-1 ml-1 bg-emerald-500 rounded-full"></span>
           </div>
 
-          <div class="mt-8 xl:mt-12 lg:flex lg:items-center">
-            <div class="hidden lg:flex lg:w-1/2 lg:justify-center">
+          <div className="mt-8 xl:mt-12 lg:flex lg:items-center">
+            <div className="hidden lg:flex lg:w-1/2 lg:justify-center">
               <img
-                class="w-[28rem] h-[28rem] flex-shrink-0 object-cover xl:w-[34rem] xl:h-[34rem] rounded-3xl"
+                className="w-[28rem] h-[28rem] flex-shrink-0 object-cover xl:w-[34rem] xl:h-[34rem] rounded-3xl"
                 src={FeatureImage}
                 alt=""
               />
             </div>
-            <div class="grid w-full grid-cols-1 gap-8 lg:w-1/2 xl:gap-16 md:grid-cols-2">
-              <div class="space-y-3">
-                <span class="inline-block p-3 text-emerald-500 bg-blue-100 rounded-xl dark:text-white dark:bg-emerald-500">
+            <div className="grid w-full grid-cols-1 gap-8 lg:w-1/2 xl:gap-16 md:grid-cols-2">
+              <div className="space-y-3">
+                <span className="inline-block p-3 text-emerald-500 bg-blue-100 rounded-xl dark:text-white dark:bg-emerald-500">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="w-6 h-6"
+                    className="w-6 h-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -42,22 +42,22 @@ const Features = () => {
                   </svg>
                 </span>
 
-                <h1 class="text-xl font-semibold text-gray-700 capitalize dark:text-white">
+                <h1 className="text-xl font-semibold text-gray-700 capitalize dark:text-white">
                   Create Expenses
                 </h1>
 
-                <p class="text-gray-500 dark:text-gray-300">
+                <p className="text-gray-500 dark:text-gray-300">
                   Lorem ipsum dolor sit amet consectetur adipisicing elit.
                   Provident ab nulla quod dignissimos vel non corrupti doloribus
                   voluptatum eveniet
                 </p>
               </div>
 
-              <div class="space-y-3">
-                <span class="inline-block p-3 text-emerald-500 bg-blue-100 rounded-xl dark:text-white dark:bg-emerald-500">
+              <div className="space-y-3">
+                <span className="inline-block p-3 text-emerald-500 bg-blue-100 rounded-xl dark:text-white dark:bg-emerald-500">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="w-6 h-6"
+                    className="w-6 h-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -77,22 +77,22 @@ const Features = () => {
                   </svg>
                 </span>
 
-                <h1 class="text-xl font-semibold text-gray-700 capitalize dark:text-white">
+                <h1 className="text-xl font-semibold text-gray-700 capitalize dark:text-white">
                   Track Expenses
                 </h1>
 
-                <p class="text-gray-500 dark:text-gray-300">
+                <p className="text-gray-500 dark:text-gray-300">
                   Lorem ipsum dolor sit amet consectetur adipisicing elit.
                   Provident ab nulla quod dignissimos vel non corrupti doloribus
                   voluptatum eveniet
                 </p>
               </div>
 
-              <div class="space-y-3">
-                <span class="inline-block p-3 text-emerald-500 bg-blue-100 rounded-xl dark:text-white dark:bg-emerald-500">
+              <div className="space-y-3">
+                <span className="inline-block p-3 text-emerald-500 bg-blue-100 rounded-xl dark:text-white dark:bg-emerald-500">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="w-6 h-6"
+                    className="w-6 h-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -106,22 +106,22 @@ const Features = () => {
                   </svg>
                 </span>
 
-                <h1 class="text-xl font-semibold text-gray-700 capitalize dark:text-white">
+                <h1 className="text-xl font-semibold text-gray-700 capitalize dark:text-white">
                   Easy to customiztions
                 </h1>
 
-                <p class="text-gray-500 dark:text-gray-300">
+                <p className="text-gray-500 dark:text-gray-300">
                   Lorem ipsum dolor sit amet consectetur adipisicing elit.
                   Provident ab nulla quod dignissimos vel non corrupti doloribus
                   voluptatum eveniet
                 </p>
               </div>
 
-              <div class="space-y-3">
-                <span class="inline-block p-3 text-emerald-500 bg-blue-100 rounded-xl dark:text-white dark:bg-emerald-500">
+              <div className="space-y-3">
+                <span className="inline-block p-3 text-emerald-500 bg-blue-100 rounded-xl dark:text-white dark:bg-emerald-500">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="w-6 h-6"
+                    className="w-6 h-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -135,11 +135,11 @@ const Features = () => {
                   </svg>
                 </span>
 
-                <h1 class="text-xl font-semibold text-gray-700 capitalize dark:text-white">
+                <h1 className="text-xl font-semibold text-gray-700 capitalize dark:text-white">
                   Simple & clean designs
                 </h1>
 
-                <p class="text-gray-500 dark:text-gray-300">
+                <p className="text-gray-500 dark:text-gray-300">
                   Lorem ipsum dolor sit amet consectetur adipisicing elit.
                   Provident ab nulla quod dignissimos vel non corrupti doloribus
                   voluptatum eveniet
