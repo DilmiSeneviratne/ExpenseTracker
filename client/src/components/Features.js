@@ -3,7 +3,7 @@ import FeatureImage from "../Assests/features.jpg";
 const Features = () => {
   return (
     <>
-      <section className="bg-white dark:bg-gray-900">
+      <section id="features" className="bg-white dark:bg-gray-900">
         <div className="container px-6 py-10 mx-auto">
           <h1 className="text-2xl font-semibold text-gray-800 capitalize lg:text-3xl dark:text-white">
             explore our <br /> awesome Features
@@ -37,19 +37,20 @@ const Features = () => {
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       stroke-width="2"
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                      d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
                     />
                   </svg>
                 </span>
 
                 <h1 className="text-xl font-semibold text-gray-700 capitalize dark:text-white">
-                  Create Expenses
+                  Secure Registration and Login
                 </h1>
 
                 <p className="text-gray-500 dark:text-gray-300">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Provident ab nulla quod dignissimos vel non corrupti doloribus
-                  voluptatum eveniet
+                  Easily create an account or log in with our secure and
+                  user-friendly system. Your data is protected with
+                  industry-standard encryption for a seamless and safe
+                  experience
                 </p>
               </div>
 
@@ -78,13 +79,13 @@ const Features = () => {
                 </span>
 
                 <h1 className="text-xl font-semibold text-gray-700 capitalize dark:text-white">
-                  Track Expenses
+                  Dashboard and Personalized Experience
                 </h1>
 
                 <p className="text-gray-500 dark:text-gray-300">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Provident ab nulla quod dignissimos vel non corrupti doloribus
-                  voluptatum eveniet
+                  Access a personalized dashboard tailored to your preferences.
+                  Manage your profile, track your activities, and enjoy features
+                  designed just for you
                 </p>
               </div>
 
@@ -101,19 +102,19 @@ const Features = () => {
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       stroke-width="2"
-                      d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                     />
                   </svg>
                 </span>
 
                 <h1 className="text-xl font-semibold text-gray-700 capitalize dark:text-white">
-                  Have own profile
+                  Advanced Expense Tracking
                 </h1>
 
                 <p className="text-gray-500 dark:text-gray-300">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Provident ab nulla quod dignissimos vel non corrupti doloribus
-                  voluptatum eveniet
+                  Keep your expenses under control with real-time tracking and
+                  insightful reports. Get detailed breakdowns of your spending
+                  patterns to make smarter financial decisions
                 </p>
               </div>
 
@@ -136,13 +137,13 @@ const Features = () => {
                 </span>
 
                 <h1 className="text-xl font-semibold text-gray-700 capitalize dark:text-white">
-                  Simple & clean designs
+                  User-Friendly Interface
                 </h1>
 
                 <p className="text-gray-500 dark:text-gray-300">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Provident ab nulla quod dignissimos vel non corrupti doloribus
-                  voluptatum eveniet
+                  Navigate effortlessly with our intuitive and responsive
+                  design. Designed for all devices, our application ensures a
+                  smooth experience whether you're at home or on the go
                 </p>
               </div>
             </div>
