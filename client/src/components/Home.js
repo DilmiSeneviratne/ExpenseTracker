@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "./Navbar";
 import Features from "./Features";
+import Testimonials from "./Testimonials";
 import Footer from "./Footer";
 import BannerImage from "../Assests/home-banner-image.png";
 
@@ -66,6 +67,7 @@ const Home = () => {
         </div>
       </section>
       <Features />
+      <Testimonials />
       {/*      Main modal */}
       {isLoginModalOpen && (
         <div
