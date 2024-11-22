@@ -7,7 +7,7 @@ const Navbar = ({ handleLoginModalOpen }) => {
   return (
     <>
       {/*<!-- Component: Navbar with CTA --> */}
-      <header className="relative z-20 w-full border-b shadow-lg border-slate-200 bg-white/90 shadow-slate-700/5 after:absolute after:left-0 after:top-full after:z-10 after:block after:h-px after:w-full after:bg-slate-200 lg:border-slate-200 lg:backdrop-blur-sm lg:after:hidden">
+      <header className="sticky top-0 z-50 w-full border-b shadow-lg border-slate-200 bg-white/90 shadow-slate-700/5 lg:border-slate-200 lg:backdrop-blur-sm">
         <div className="relative mx-auto max-w-full px-6 lg:max-w-5xl xl:max-w-7xl 2xl:max-w-[96rem]">
           <nav
             aria-label="main navigation"
@@ -85,9 +85,9 @@ const Navbar = ({ handleLoginModalOpen }) => {
                   aria-current="page"
                   aria-haspopup="false"
                   className="flex items-center gap-2 py-4 transition-colors duration-300 text-emerald-500 hover:text-emerald-600 focus:text-emerald-600 focus:outline-none focus-visible:outline-none lg:px-8"
-                  href="javascript:void(0)"
+                  href="#features"
                 >
-                  <span>About</span>
+                  <span>Features</span>
                 </a>
               </li>
               <li role="none" className="flex items-stretch">
@@ -95,7 +95,7 @@ const Navbar = ({ handleLoginModalOpen }) => {
                   role="menuitem"
                   aria-haspopup="false"
                   className="flex items-center gap-2 py-4 transition-colors duration-300 hover:text-emerald-500 focus:text-emerald-600 focus:outline-none focus-visible:outline-none lg:px-8"
-                  href="javascript:void(0)"
+                  href="#testimonials"
                 >
                   <span>Testimonials</span>
                 </a>
