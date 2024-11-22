@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import FeatureImage from "../Assests/features.jpg";
 const Features = () => {
   return (
@@ -107,7 +107,7 @@ const Features = () => {
                 </span>
 
                 <h1 className="text-xl font-semibold text-gray-700 capitalize dark:text-white">
-                  Easy to customiztions
+                  Have own profile
                 </h1>
 
                 <p className="text-gray-500 dark:text-gray-300">
@@ -151,6 +151,6 @@ const Features = () => {
       </section>
     </>
   );
-}
+};
 
-export default Features
+export default Features;
