@@ -4,10 +4,16 @@ import Features from "./Features";
 import Testimonials from "./Testimonials";
 import Footer from "./Footer";
 import BannerImage from "../Assests/home-banner-image.png";
+import axios from "axios";
 
 const Home = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Function to open the login modal
   const handleLoginModalOpen = () => {
@@ -19,12 +25,38 @@ const Home = () => {
   const handleModalClose = () => {
     setIsLoginModalOpen(false);
     setIsSignUpModalOpen(false);
+    setErrorMessage("");
+    setSuccessMessage("");
   };
 
   // Function to open the sign-up modal
   const handleSignUpModalOpen = () => {
     setIsSignUpModalOpen(true);
     setIsLoginModalOpen(false);
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault(); // Prevent form from reloading the page
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/auth/register", {
+        username: name,
+        email: email,
+        password: password,
+      });
+
+      // If successful
+      setSuccessMessage(response.data.message);
+      setName("");
+      setEmail("");
+      setPassword("");
+    } catch (error) {
+      // Handle errors
+      setErrorMessage(
+        error.response?.data?.message ||
+          "Something went wrong, please try again."
+      );
+    }
   };
 
   return (
@@ -197,16 +229,26 @@ const Home = () => {
                 </button>
               </div>
               <div className="p-5">
-                <form className="space-y-4">
+                {errorMessage && (
+                  <p className="text-red-500 text-sm">{errorMessage}</p>
+                )}
+                {successMessage && (
+                  <p className="text-green-500 text-sm">{successMessage}</p>
+                )}
+                <form className="space-y-4" onSubmit={handleRegister}>
                   <input
                     type="text"
                     placeholder="Your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                   />
                   <input
                     type="email"
                     name="email"
                     id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                     placeholder="name@company.com"
                     required
@@ -216,6 +258,8 @@ const Home = () => {
                     name="password"
                     id="password"
                     placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                     required
                   />
