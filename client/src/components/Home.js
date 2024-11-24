@@ -7,6 +7,7 @@ import BannerImage from "../Assests/home-banner-image.png";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify"; // Import Toastify
 import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -14,7 +15,8 @@ const Home = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+  const navigate = useNavigate(); // Initialize the useNavigate hook
+
   // Function to open the login modal
   const handleLoginModalOpen = () => {
     setIsLoginModalOpen(true);
@@ -25,7 +27,6 @@ const Home = () => {
   const handleModalClose = () => {
     setIsLoginModalOpen(false);
     setIsSignUpModalOpen(false);
-    
   };
 
   // Function to open the sign-up modal
@@ -50,10 +51,12 @@ const Home = () => {
       // If successful
       const { token } = response.data;
       localStorage.setItem("authToken", token); // Store token in localStorage
-      toast.success("Logged in successfully!" ); // Show success toaster
+      toast.success("Logged in successfully!"); // Show success toaster
       setEmail("");
       setPassword("");
       handleModalClose();
+      // Redirect to dashboard
+      navigate("/dashboard");
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Invalid login credentials."
@@ -61,7 +64,7 @@ const Home = () => {
     }
   };
 
-  //Function for handle register 
+  //Function for handle register
   const handleRegister = async (e) => {
     e.preventDefault(); // Prevent form from reloading the page
 
@@ -86,7 +89,6 @@ const Home = () => {
         error.response?.data?.message ||
           "Something went wrong, please try again."
       ); // Show error toaster
-      
     }
   };
 
@@ -173,7 +175,6 @@ const Home = () => {
               </div>
               {/*      modal body*/}
               <div className="p-4 md:p-5">
-                
                 <form className="space-y-4" action="#" onSubmit={handleLogin}>
                   <div>
                     <label
@@ -264,7 +265,6 @@ const Home = () => {
                 </button>
               </div>
               <div className="p-5">
-                
                 <form className="space-y-4" onSubmit={handleRegister}>
                   <input
                     type="text"
