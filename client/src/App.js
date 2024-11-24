@@ -1,6 +1,6 @@
 import React from 'react';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
-import Dashboard from './components/Dashboard';
+import UserDashboard from './components/UserDashboard';
 import './App.css';
 import Home from './components/Home';
 
@@ -8,17 +8,13 @@ import Home from './components/Home';
 function App() {
   return (
     <div className="App">
-      <Home/>
-      
-      </div>
-    /*<Router>
+      {/* Home Page */}
       <Routes>
-        
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/" element={<Home />} /> {/* Home page */}
+        <Route path="/dashboard" element={<UserDashboard />} />{" "}
+        {/* Dashboard page */}
       </Routes>
-    </Router>*/
+    </div>
   );
 }
 
