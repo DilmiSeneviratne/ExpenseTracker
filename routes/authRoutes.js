@@ -53,4 +53,14 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// Logout Route
+router.post("/logout", authMiddleware, (req, res) => {
+  try {
+    // Invalidate token by clearing it from the client side
+    res.json({ message: "User logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

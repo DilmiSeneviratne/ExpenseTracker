@@ -11,14 +11,14 @@ const Income = () => {
       <div className="p-4">
         {/* Total Income Section */}
         <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="flex flex-col sm:flex-row items-center sm:justify-between h-auto sm:h-24 p-4 rounded-2xl bg-white dark:bg-gray-800 shadow-lg sm:rounded-lg">
+          <div className="flex flex-col items-center justify-center w-[200px] h-[200px] min-w-[60px] min-h-[60px] sm:min-w-[40px] sm:min-h-[40px] aspect-square p-4 rounded-2xl bg-emerald-200 dark:bg-gray-800 shadow-lg sm:rounded-lg">
             <div className="text-center sm:text-left">
-              <p className="text-base sm:text-xl text-gray-700 dark:text-gray-300">
+              <p className="text-md sm:text-lg text-gray-700 dark:text-gray-300">
                 Total Income
               </p>
             </div>
             <div className="mt-2 sm:mt-0 text-center">
-              <p className="text-lg sm:text-2xl font-bold text-gray-700 dark:text-gray-300">
+              <p className="text-lg sm:text-xl font-bold text-gray-700 dark:text-gray-300">
                 $4000
               </p>
             </div>

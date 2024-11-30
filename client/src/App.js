@@ -8,6 +8,7 @@ import Income from "./components/Income";
 import Expense from "./components/Expense";
 import Profile from "./components/Profile";
 
+
 function App() {
   return (
     <div className="App">

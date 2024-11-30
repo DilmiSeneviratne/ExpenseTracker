@@ -5,24 +5,33 @@ const Dashboard = () => {
   return (
     <>
       <div className="p-4 ">
-        <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="flex items-center justify-center h-24 rounded-2xl bg-white dark:bg-gray-800 shadow-lg sm:rounded-lg">
-            <p className="text-2xl text-gray-700 dark:text-gray-900 pr-5">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          {/* Total Income */}
+          <div className="flex flex-col items-center justify-center w-[200px] h-[200px] min-w-[60px] min-h-[60px] sm:min-w-[40px] sm:min-h-[40px] aspect-square p-4 m-auto rounded-xl bg-emerald-100 dark:bg-gray-800 shadow-lg">
+            <p className="text-md sm:text-lg text-gray-700 dark:text-gray-300">
               Total Income
             </p>
-            <p className="text-2xl text-gray-700 dark:text-gray-900">$4000</p>
-          </div>
-          <div className="flex items-center justify-center h-24 rounded-2xl bg-white dark:bg-gray-800 shadow-lg sm:rounded-lg">
-            <p className="text-2xl  text-gray-700 dark:text-gray-900 pr-5">
-              Total Expenses
+            <p className="mt-2 text-lg sm:text-xl font-bold text-gray-700 dark:text-gray-300">
+              $4000
             </p>
-            <p className="text-2xl text-gray-700 dark:text-gray-900">$4000</p>
           </div>
-          <div className="flex items-center justify-center h-24 rounded-2xl bg-white dark:bg-gray-800 shadow-lg sm:rounded-lg">
-            <p className="text-2xl  text-gray-700 dark:text-gray-900 pr-5">
+          {/* Total Expense */}
+          <div className="flex flex-col items-center justify-center w-[200px] h-[200px] min-w-[60px] min-h-[60px] sm:min-w-[40px] sm:min-h-[40px] aspect-square p-4 m-auto rounded-xl bg-emerald-200 dark:bg-gray-800 shadow-lg">
+            <p className="text-md sm:text-lg text-gray-700 dark:text-gray-300">
+              Total Expense
+            </p>
+            <p className="mt-2 text-lg sm:text-xl font-bold text-gray-700 dark:text-gray-300">
+              $4000
+            </p>
+          </div>
+          {/* Total Profit */}
+          <div className="flex flex-col items-center justify-center w-[200px] h-[200px] min-w-[60px] min-h-[60px] sm:min-w-[40px] sm:min-h-[40px] aspect-square p-4 m-auto rounded-xl bg-emerald-300 dark:bg-gray-800 shadow-lg">
+            <p className="text-md sm:text-lg text-gray-700 dark:text-gray-300">
               Total Profit
             </p>
-            <p className="text-2xl text-gray-700 dark:text-gray-900">$4000</p>
+            <p className="mt-2 text-lg sm:text-xl font-bold text-gray-700 dark:text-gray-300">
+              $4000
+            </p>
           </div>
         </div>
         <div className="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
@@ -51,7 +60,6 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      ;
     </>
   );
 };
