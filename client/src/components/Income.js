@@ -1,10 +1,123 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify"; // Import Toastify
+import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
+import { jwtDecode } from "jwt-decode";
 
 const Income = () => {
   // State for controlling modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [incomes, setIncomes] = useState([]); // State to store fetched incomes
+  const [currentMonthIncome, setCurrentMonthIncome] = useState(0);
+  const [monthName, setMonthName] = useState("");
+  const [formData, setFormData] = useState({
+    date: "",
+    amount: "",
+    category: "",
+    description: "",
+  });
+
+  // Get user ID from JWT token in localStorage
+  useEffect(() => {
+    const token = localStorage.getItem("authToken"); // Replace "token" with your token's key name in localStorage
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setUserId(decodedToken.id); // Assuming the user ID is stored in the "id" field
+      } catch (err) {
+        console.error("Failed to decode token", err);
+      }
+    }
+  }, []);
+
+  // Fetch incomes from the backend
+  useEffect(() => {
+    if (userId) {
+      const fetchIncomes = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:5000/api/income/all/${userId}`
+          );
+          setIncomes(response.data); // Update incomes state with fetched data
+
+          // Automatically calculate income for the current month
+          const currentDate = new Date();
+          const currentMonth = currentDate.getMonth() + 1; // Months are 0-indexed
+          const currentYear = currentDate.getFullYear();
+
+          // Set month name
+          const monthNames = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+          ];
+          setMonthName(monthNames[currentDate.getMonth()]);
+
+          setCurrentMonthIncome(
+            calculateMonthlyIncome(currentMonth, currentYear, response.data)
+          );
+        } catch (err) {
+          toast.error(
+            err.response?.data?.message || "Failed to fetch incomes."
+          );
+          console.error(err);
+        }
+      };
+
+      fetchIncomes();
+    }
+  }, [userId]);
+
+  const calculateMonthlyIncome = (month, year, incomeData) => {
+    return incomeData
+      .filter((income) => {
+        const incomeDate = new Date(income.date);
+        return (
+          incomeDate.getMonth() + 1 === month && // Months are 0-indexed
+          incomeDate.getFullYear() === year
+        );
+      })
+      .reduce((total, income) => total + income.amount, 0);
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/income/add",
+        {
+          userId, // Pass the extracted user ID here
+          ...formData,
+        }
+      );
+      toast.success("Income Added Successfully"); // Show success toaster
+      setIsModalOpen(false);
+      setFormData({ date: "", amount: "", category: "", description: "" });
+      console.log("success");
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "Something went wrong, please try again."
+      ); // Show error toaster
+      console.log(err);
+    }
+  };
 
   return (
     <>
@@ -19,7 +132,7 @@ const Income = () => {
             </div>
             <div className="mt-2 sm:mt-0 text-center">
               <p className="text-lg sm:text-xl font-bold text-gray-700 dark:text-gray-300">
-                $4000
+                {monthName}: ${currentMonthIncome}
               </p>
             </div>
           </div>
@@ -58,25 +171,31 @@ const Income = () => {
               </tr>
             </thead>
             <tbody>
-              <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                <td className="px-6 py-4">Silver</td>
-                <td className="px-6 py-4">Silver</td>
-                <td className="px-6 py-4">Laptop</td>
-                <td className="px-6 py-4">$2999</td>
-                <td className="px-6 py-4 text-2xl flex items-center justify-center space-x-4">
-                  <a href="#" className="text-green-500 hover:text-green-700">
-                    <BiSolidEditAlt />
-                  </a>
-                  <a href="#" className="text-red-500 hover:text-red-700">
-                    <RiDeleteBin6Line />
-                  </a>
-                </td>
-              </tr>
+              {incomes.map((income) => (
+                <tr
+                  key={income._id}
+                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                >
+                  <td className="px-6 py-4">
+                    {new Date(income.date).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4">{income.amount}</td>
+                  <td className="px-6 py-4">{income.category}</td>
+                  <td className="px-6 py-4">{income.description}</td>
+                  <td className="px-6 py-4 text-2xl flex items-center justify-center space-x-4">
+                    <a href="#" className="text-green-500 hover:text-green-700">
+                      <BiSolidEditAlt />
+                    </a>
+                    <a href="#" className="text-red-500 hover:text-red-700">
+                      <RiDeleteBin6Line />
+                    </a>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </div>
-
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -95,7 +214,7 @@ const Income = () => {
             </div>
 
             {/* Modal Body */}
-            <form className="p-4">
+            <form className="p-4" onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label
                   htmlFor="date"
@@ -106,6 +225,8 @@ const Income = () => {
                 <input
                   type="date"
                   id="date"
+                  value={formData.date}
+                  onChange={handleChange}
                   className="w-full p-2 border rounded-lg dark:bg-gray-600 dark:text-white"
                   placeholder="Select date"
                 />
@@ -119,9 +240,10 @@ const Income = () => {
                 </label>
                 <input
                   type="number"
-                  id="income-amount"
+                  id="amount"
+                  value={formData.amount}
+                  onChange={handleChange}
                   className="w-full p-2 border rounded-lg dark:bg-gray-600 dark:text-white"
-                  placeholder="Enter income amount"
                 />
               </div>
               <div className="mb-4">
@@ -132,7 +254,9 @@ const Income = () => {
                   Category
                 </label>
                 <select
-                  id="income-category"
+                  id="category"
+                  value={formData.category}
+                  onChange={handleChange}
                   className="w-full p-2 border rounded-lg dark:bg-gray-600 dark:text-white"
                 >
                   <option value="">Select Category</option>
@@ -148,7 +272,9 @@ const Income = () => {
                   Description
                 </label>
                 <textarea
-                  id="date"
+                  id="description"
+                  value={formData.description}
+                  onChange={handleChange}
                   className="w-full p-2 border rounded-lg dark:bg-gray-600 dark:text-white"
                   placeholder="Enter description"
                 />
@@ -163,6 +289,8 @@ const Income = () => {
           </div>
         </div>
       )}
+      <ToastContainer position="top-right" autoClose={5000} />{" "}
+      {/* Add ToastContainer */}
     </>
   );
 };
