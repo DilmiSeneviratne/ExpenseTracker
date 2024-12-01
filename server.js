@@ -29,6 +29,8 @@ mongoose
 
   // Import Routes
 const authRoutes = require("./routes/authRoutes"); // Make sure this path is correct
+const incomeRoutes = require("./routes/incomeRoutes"); // Make sure this path is correct
 
 // Use Routes
 app.use("/api/auth", authRoutes); // Use "/api/auth" as the base route for authentication
+app.use("/api/income", incomeRoutes); 
