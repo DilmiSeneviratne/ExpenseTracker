@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify"; // Import Toastify
-import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { jwtDecode } from "jwt-decode";
 
 const Income = () => {
-  // State for controlling modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userId, setUserId] = useState("");
-  const [incomes, setIncomes] = useState([]); // State to store fetched incomes
+  const [incomes, setIncomes] = useState([]);
+  const [selectedIncome, setSelectedIncome] = useState(null);
   const [currentMonthIncome, setCurrentMonthIncome] = useState(0);
   const [monthName, setMonthName] = useState("");
   const [formData, setFormData] = useState({
@@ -22,11 +22,11 @@ const Income = () => {
 
   // Get user ID from JWT token in localStorage
   useEffect(() => {
-    const token = localStorage.getItem("authToken"); // Replace "token" with your token's key name in localStorage
+    const token = localStorage.getItem("authToken");
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        setUserId(decodedToken.id); // Assuming the user ID is stored in the "id" field
+        setUserId(decodedToken.id);
       } catch (err) {
         console.error("Failed to decode token", err);
       }
@@ -41,14 +41,12 @@ const Income = () => {
           const response = await axios.get(
             `http://localhost:5000/api/income/all/${userId}`
           );
-          setIncomes(response.data); // Update incomes state with fetched data
+          setIncomes(response.data);
 
-          // Automatically calculate income for the current month
           const currentDate = new Date();
-          const currentMonth = currentDate.getMonth() + 1; // Months are 0-indexed
+          const currentMonth = currentDate.getMonth() + 1;
           const currentYear = currentDate.getFullYear();
 
-          // Set month name
           const monthNames = [
             "January",
             "February",
@@ -85,37 +83,118 @@ const Income = () => {
       .filter((income) => {
         const incomeDate = new Date(income.date);
         return (
-          incomeDate.getMonth() + 1 === month && // Months are 0-indexed
+          incomeDate.getMonth() + 1 === month &&
           incomeDate.getFullYear() === year
         );
       })
-      .reduce((total, income) => total + income.amount, 0);
+      .reduce((total, income) => total + Number(income.amount), 0); // Convert to number
   };
 
+  // Handle form input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/income/add",
-        {
-          userId, // Pass the extracted user ID here
-          ...formData,
-        }
-      );
-      toast.success("Income Added Successfully"); // Show success toaster
+      if (selectedIncome) {
+        // Update existing income
+        await axios.put(
+          `http://localhost:5000/api/income/update/${selectedIncome._id}`,
+          {
+            userId,
+            ...formData,
+          }
+        );
+        toast.success("Income Updated Successfully");
+
+        // Update the income in the local state
+        const updatedIncomes = incomes.map((income) =>
+          income._id === selectedIncome._id
+            ? { ...income, ...formData }
+            : income
+        );
+        setIncomes(updatedIncomes);
+
+        // Recalculate total income after updating
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1;
+        const currentYear = currentDate.getFullYear();
+        setCurrentMonthIncome(
+          calculateMonthlyIncome(currentMonth, currentYear, updatedIncomes)
+        );
+      } else {
+        // Add new income
+        const response = await axios.post(
+          "http://localhost:5000/api/income/add",
+          {
+            userId,
+            ...formData,
+          }
+        );
+        toast.success("Income Added Successfully");
+
+        // Add the new income to the state
+        const newIncomes = [...incomes, response.data];
+        setIncomes(newIncomes);
+
+        // Recalculate the current month's total income
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1;
+        const currentYear = currentDate.getFullYear();
+        setCurrentMonthIncome(
+          calculateMonthlyIncome(currentMonth, currentYear, newIncomes)
+        );
+      }
+
       setIsModalOpen(false);
       setFormData({ date: "", amount: "", category: "", description: "" });
-      console.log("success");
+      setSelectedIncome(null); // Clear selected income after action
     } catch (err) {
       toast.error(
         err.response?.data?.message || "Something went wrong, please try again."
-      ); // Show error toaster
+      );
       console.log(err);
+    }
+  };
+
+  // Handle edit click
+  const handleEdit = (income) => {
+    setSelectedIncome(income);
+    setFormData({
+      date: income.date,
+      amount: income.amount,
+      category: income.category,
+      description: income.description,
+    });
+    setIsModalOpen(true);
+  };
+
+  // Handle delete income
+  const handleDelete = async (incomeId) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/income/delete/${incomeId}`);
+      toast.success("Income deleted successfully");
+
+      // Update local incomes state
+      const updatedIncomes = incomes.filter(
+        (income) => income._id !== incomeId
+      );
+      setIncomes(updatedIncomes);
+
+      // Recalculate total income
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth() + 1;
+      const currentYear = currentDate.getFullYear();
+      setCurrentMonthIncome(
+        calculateMonthlyIncome(currentMonth, currentYear, updatedIncomes)
+      );
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete income.");
+      console.error(err);
     }
   };
 
@@ -141,7 +220,7 @@ const Income = () => {
         {/* Add Income Button */}
         <div className="flex justify-end mb-4">
           <button
-            onClick={() => setIsModalOpen(true)} // Open modal on click
+            onClick={() => setIsModalOpen(true)}
             className="inline-flex items-center justify-center h-12 gap-2 px-6 text-base font-medium tracking-wide text-white transition duration-300 rounded shadow-lg focus-visible:outline-none whitespace-nowrap bg-emerald-500 shadow-emerald-200 hover:bg-emerald-600 hover:shadow-md hover:shadow-emerald-200 focus:bg-emerald-700 focus:shadow-md focus:shadow-emerald-200 disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
           >
             <span>Add Income</span>
@@ -183,10 +262,18 @@ const Income = () => {
                   <td className="px-6 py-4">{income.category}</td>
                   <td className="px-6 py-4">{income.description}</td>
                   <td className="px-6 py-4 text-2xl flex items-center justify-center space-x-4">
-                    <a href="#" className="text-green-500 hover:text-green-700">
+                    <a
+                      href="#"
+                      className="text-green-500 hover:text-green-700"
+                      onClick={() => handleEdit(income)}
+                    >
                       <BiSolidEditAlt />
                     </a>
-                    <a href="#" className="text-red-500 hover:text-red-700">
+                    <a
+                      href="#"
+                      className="text-red-500 hover:text-red-700"
+                      onClick={() => handleDelete(income._id)}
+                    >
                       <RiDeleteBin6Line />
                     </a>
                   </td>
@@ -196,101 +283,111 @@ const Income = () => {
           </table>
         </div>
       </div>
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg dark:bg-gray-700 w-full max-w-md">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 border-b dark:border-gray-600">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Add New Income
-              </h3>
-              <button
-                onClick={() => setIsModalOpen(false)} // Close modal on click
-                className="text-gray-400 hover:text-gray-900 hover:bg-gray-200 rounded-lg p-2 dark:hover:text-white dark:hover:bg-gray-600"
-              >
-                ✕
-              </button>
-            </div>
 
-            {/* Modal Body */}
-            <form className="p-4" onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label
-                  htmlFor="date"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+      {/* Modal for adding or editing income */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            className="bg-white dark:bg-gray-800 p-6 rounded-lg w-[80vw] sm:w-[60vw] md:w-[40vw]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <form onSubmit={handleSubmit}>
+              <div className="flex justify-between mb-4">
+                <h2 className="text-xl font-semibold">
+                  {selectedIncome ? "Edit" : "Add"} Income
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-gray-500 hover:text-gray-700"
                 >
-                  Date
-                </label>
-                <input
-                  type="date"
-                  id="date"
-                  value={formData.date}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-lg dark:bg-gray-600 dark:text-white"
-                  placeholder="Select date"
-                />
+                  X
+                </button>
               </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="income-amount"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Income Amount
-                </label>
-                <input
-                  type="number"
-                  id="amount"
-                  value={formData.amount}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-lg dark:bg-gray-600 dark:text-white"
-                />
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="income-category"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Category
-                </label>
-                <select
-                  id="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-lg dark:bg-gray-600 dark:text-white"
-                >
-                  <option value="">Select Category</option>
-                  <option value="salary">Salary</option>
-                  <option value="freelance">Freelance</option>
-                </select>
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="description"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-lg dark:bg-gray-600 dark:text-white"
-                  placeholder="Enter description"
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full py-2 mt-4 text-white bg-emerald-500 rounded-lg hover:bg-emerald-600"
+
+              <label
+                htmlFor="date"
+                className="block text-gray-700 dark:text-gray-300 mb-2"
               >
-                Add Income
-              </button>
+                Date
+              </label>
+              <input
+                type="date"
+                id="date"
+                value={formData.date}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md mb-4"
+              />
+
+              <label
+                htmlFor="amount"
+                className="block text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Amount
+              </label>
+              <input
+                type="number"
+                id="amount"
+                value={formData.amount}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md mb-4"
+              />
+
+              <label
+                htmlFor="income-category"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Category
+              </label>
+              <select
+                id="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="w-full p-2 border rounded-lg dark:bg-gray-600 dark:text-white"
+              >
+                <option value="">Select Category</option>
+                <option value="salary">Salary</option>
+                <option value="freelance">Freelance</option>
+              </select>
+
+              <label
+                htmlFor="description"
+                className="block text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Description
+              </label>
+              <textarea
+                id="description"
+                value={formData.description}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md mb-4"
+              />
+
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-6 py-2 text-gray-600 dark:text-gray-300 border rounded-md"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 text-white bg-emerald-500 rounded-md"
+                >
+                  Save
+                </button>
+              </div>
             </form>
           </div>
         </div>
       )}
-      <ToastContainer position="top-right" autoClose={5000} />{" "}
-      {/* Add ToastContainer */}
     </>
   );
 };
