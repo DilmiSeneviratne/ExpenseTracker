@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Expense = require("../models/expense"); // Import expense model
+const mongoose = require("mongoose"); // Import mongoose
 
 // Add a new expense
 router.post('/add', async (req, res) => {
@@ -52,6 +53,90 @@ router.get('/all/:userId', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Error fetching expenses', error });
     }
+});
+
+// Calculate total income for the current month
+router.get("/total/current-month/:userId", async (req, res) => {
+  const { userId } = req.params;
+  try {
+    // Get the first and last dates of the current month
+    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+
+    // Fetch incomes within the current month for the user
+    const expenses = await Expense.find({
+      userId,
+      date: { $gte: startOfMonth, $lte: endOfMonth }, // Filter by date range
+    });
+
+    // Calculate the total income
+    const totalExpense = expenses.reduce((total, expense) => total + expense.amount, 0);
+
+    res.status(200).json({ totalExpense });
+  } catch (error) {
+    res.status(500).json({ message: "Error calculating total expense", error });
+  }
+});
+
+// Get Monthly Expenses
+router.get("/monthly/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const currentYear = new Date().getFullYear();
+
+    // Aggregate expenses grouped by month for the current year
+    const expenseData = await Expense.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          date: {
+            $gte: new Date(`${currentYear}-01-01`),
+            $lt: new Date(`${currentYear + 1}-01-01`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { month: { $month: "$date" } },
+          totalExpense: { $sum: "$amount" },
+        },
+      },
+      { $sort: { "_id.month": 1 } },
+    ]);
+
+    // Create an array of months (1-12) with default values of 0
+    const months = Array.from({ length: 12 }, (_, i) => ({
+      month: i + 1,
+      totalExpense: 0,
+    }));
+
+    // Merge the aggregated data with the months array
+    expenseData.forEach((record) => {
+      months[record._id.month - 1].totalExpense = record.totalExpense;
+    });
+
+    res.status(200).json({
+      months: [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ],
+      values: months.map((m) => m.totalExpense),
+    });
+  } catch (error) {
+    console.error("Error fetching monthly expenses:", error);
+    res.status(500).json({ error: "Failed to fetch monthly expenses" });
+  }
 });
 
 module.exports = router;
