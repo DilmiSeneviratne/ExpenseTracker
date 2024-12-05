@@ -14,6 +14,7 @@ const Income = () => {
   const [currentMonthIncome, setCurrentMonthIncome] = useState(0);
   const [monthName, setMonthName] = useState("");
   const [formData, setFormData] = useState({
+    incomeName: "",
     date: "",
     amount: "",
     category: "",
@@ -151,7 +152,7 @@ const Income = () => {
       }
 
       setIsModalOpen(false);
-      setFormData({ date: "", amount: "", category: "", description: "" });
+      setFormData({ incomeName: "", date: "", amount: "", category: "", description: "" });
       setSelectedIncome(null); // Clear selected income after action
     } catch (err) {
       toast.error(
@@ -165,6 +166,7 @@ const Income = () => {
   const handleEdit = (income) => {
     setSelectedIncome(income);
     setFormData({
+      incomeName: income.incomeName,
       date: income.date,
       amount: income.amount,
       category: income.category,
@@ -233,6 +235,9 @@ const Income = () => {
             <thead className="text-base text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
               <tr>
                 <th scope="col" className="px-6 py-3">
+                  Income Name
+                </th>
+                <th scope="col" className="px-6 py-3">
                   Date
                 </th>
                 <th scope="col" className="px-6 py-3">
@@ -255,6 +260,7 @@ const Income = () => {
                   key={income._id}
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
+                  <td className="px-6 py-4">{income.incomeName}</td>
                   <td className="px-6 py-4">
                     {new Date(income.date).toLocaleDateString()}
                   </td>
@@ -307,6 +313,21 @@ const Income = () => {
                   X
                 </button>
               </div>
+
+              <label
+                htmlFor="incomeName"
+                className="block text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Income Name
+              </label>
+              <input
+                type="text"
+                id="incomeName"
+                value={formData.incomeName}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md mb-4"
+              />
 
               <label
                 htmlFor="date"

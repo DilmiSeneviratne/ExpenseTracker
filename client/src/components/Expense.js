@@ -14,6 +14,7 @@ const Expense = () => {
   const [currentMonthExpense, setCurrentMonthExpense] = useState(0);
   const [monthName, setMonthName] = useState("");
   const [formData, setFormData] = useState({
+    expenseName: "",
     date: "",
     amount: "",
     category: "",
@@ -151,7 +152,7 @@ const Expense = () => {
       }
 
       setIsModalOpen(false);
-      setFormData({ date: "", amount: "", category: "", description: "" });
+      setFormData({ expenseName: "",date: "", amount: "", category: "", description: "" });
       setSelectedExpense(null); // Clear selected expense after action
     } catch (err) {
       toast.error(
@@ -165,6 +166,7 @@ const Expense = () => {
   const handleEdit = (expense) => {
     setSelectedExpense(expense);
     setFormData({
+      expenseName: expense.expenseName,
       date: expense.date,
       amount: expense.amount,
       category: expense.category,
@@ -235,6 +237,9 @@ const Expense = () => {
             <thead className="text-base text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
               <tr>
                 <th scope="col" className="px-6 py-3">
+                  Expense Name
+                </th>
+                <th scope="col" className="px-6 py-3">
                   Date
                 </th>
                 <th scope="col" className="px-6 py-3">
@@ -257,6 +262,7 @@ const Expense = () => {
                   key={expense._id}
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
+                  <td className="px-6 py-4">{expense.expenseName}</td>
                   <td className="px-6 py-4">
                     {new Date(expense.date).toLocaleDateString()}
                   </td>
@@ -310,6 +316,21 @@ const Expense = () => {
                 </button>
               </div>
 
+              <label
+                htmlFor="expenseName"
+                className="block text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Expense Name
+              </label>
+              <input
+                type="text"
+                id="expenseName"
+                value={formData.expenseName}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md mb-4"
+              />
+              
               <label
                 htmlFor="date"
                 className="block text-gray-700 dark:text-gray-300 mb-2"
