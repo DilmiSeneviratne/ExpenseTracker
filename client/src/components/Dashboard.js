@@ -11,6 +11,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { HiOutlineCurrencyDollar } from "react-icons/hi2";
+import { TbCoins } from "react-icons/tb";
+import { MdOutlineSavings } from "react-icons/md";
 
 ChartJS.register(
   CategoryScale,
@@ -179,64 +182,88 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="p-4 ">
-        <div className="flex items-center justify-center h-[300px] mt-auto mb-10 rounded bg-white dark:bg-gray-800">
-          <div className="flex flex-col md:flex-row gap-20 w-full h-full">
-            <div className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl p-4">
-              <Line options={chartOptions} data={incomeData} />
-            </div>
-            <div className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl p-4">
-              <Line options={chartOptions} data={expenseData} />
-            </div>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+      <div className="p-4">
+        {/* Card Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {/* Total Income */}
-          <div className="flex flex-col items-center justify-center w-[200px] h-[200px] min-w-[60px] min-h-[60px] sm:min-w-[40px] sm:min-h-[40px] aspect-square p-4 m-auto rounded-xl bg-emerald-100 dark:bg-gray-800 shadow-lg">
-            <p className="text-md sm:text-lg text-gray-700 dark:text-gray-300">
+          <div className="flex flex-col items-center justify-center bg-white dark:bg-gray-800 border border-gray-300 rounded-xl w-full h-32 md:h-36 lg:h-40">
+            <div className="text-4xl text-emerald-500 mb-4">
+              {/* You can use any icon from libraries like Font Awesome, Heroicons, etc. */}
+              <HiOutlineCurrencyDollar />
+            </div>
+            <p className="text-sm sm:text-md text-gray-700 dark:text-gray-300 uppercase">
               Total Income
             </p>
-            <p className="mt-2 text-lg sm:text-xl font-bold text-gray-700 dark:text-gray-300">
+            <p className="mt-2 text-md sm:text-lg font-bold text-gray-700 dark:text-gray-300">
               ${totalIncome}
             </p>
           </div>
+
           {/* Total Expense */}
-          <div className="flex flex-col items-center justify-center w-[200px] h-[200px] min-w-[60px] min-h-[60px] sm:min-w-[40px] sm:min-h-[40px] aspect-square p-4 m-auto rounded-xl bg-emerald-200 dark:bg-gray-800 shadow-lg">
-            <p className="text-md sm:text-lg text-gray-700 dark:text-gray-300">
+          <div className="flex flex-col items-center justify-center bg-emerald-400 dark:bg-gray-800 rounded-xl w-full h-32 md:h-36 lg:h-40">
+            <div className="text-4xl text-white mb-4">
+              {/* You can use any icon from libraries like Font Awesome, Heroicons, etc. */}
+              <TbCoins />
+            </div>
+            <p className="text-sm sm:text-md text-white dark:text-gray-300 uppercase">
               Total Expense
             </p>
-            <p className="mt-2 text-lg sm:text-xl font-bold text-gray-700 dark:text-gray-300">
+            <p className="mt-2 text-md sm:text-lg font-bold text-white dark:text-gray-300">
               ${totalExpense}
             </p>
           </div>
+
           {/* Total Profit */}
-          <div className="flex flex-col items-center justify-center w-[200px] h-[200px] min-w-[60px] min-h-[60px] sm:min-w-[40px] sm:min-h-[40px] aspect-square p-4 m-auto rounded-xl bg-emerald-300 dark:bg-gray-800 shadow-lg">
-            <p className="text-md sm:text-lg text-gray-700 dark:text-gray-300">
-              Total Profit
+          <div className="flex flex-col items-center justify-center bg-white dark:bg-gray-800 border border-gray-300 rounded-xl w-full h-32 md:h-36 lg:h-40">
+            <div className="text-4xl text-emerald-500 mb-4">
+              {/* You can use any icon from libraries like Font Awesome, Heroicons, etc. */}
+              <MdOutlineSavings />
+            </div>
+            <p className="text-sm sm:text-md text-gray-700 dark:text-gray-300 uppercase">
+              Total savings
             </p>
-            <p className="mt-2 text-lg sm:text-xl font-bold text-gray-700 dark:text-gray-300">
+            <p className="mt-2 text-md sm:text-lg font-bold text-gray-700 dark:text-gray-300">
               ${totalIncome - totalExpense}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
-          <p className="text-2xl text-gray-400 dark:text-gray-500">
-            Categories
-          </p>
+        {/* Graph Section */}
+        <div className="flex flex-wrap gap-4 items-center justify-center mb-10">
+          <div className="w-full md:w-[45%] max-w-[500px] bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl p-4">
+            <Line options={chartOptions} data={incomeData} />
+          </div>
+          <div className="w-full md:w-[45%] max-w-[500px] bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl p-4">
+            <Line options={chartOptions} data={expenseData} />
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-            <p className="text-2xl text-gray-400 dark:text-gray-500"></p>
+
+        {/* Categories Section */}
+        <div className="flex flex-col items-center gap-4">
+          <div className="text-2xl text-gray-400 dark:text-gray-500 mb-4">
+            Categories
           </div>
-          <div className="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-            <p className="text-2xl text-gray-400 dark:text-gray-500"></p>
-          </div>
-          <div className="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-            <p className="text-2xl text-gray-400 dark:text-gray-500"></p>
-          </div>
-          <div className="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-            <p className="text-2xl text-gray-400 dark:text-gray-500"></p>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <div className="flex items-center justify-center bg-gray-50 h-28 dark:bg-gray-800 rounded">
+              <p className="text-2xl text-gray-400 dark:text-gray-500">
+                Category 1
+              </p>
+            </div>
+            <div className="flex items-center justify-center bg-gray-50 h-28 dark:bg-gray-800 rounded">
+              <p className="text-2xl text-gray-400 dark:text-gray-500">
+                Category 2
+              </p>
+            </div>
+            <div className="flex items-center justify-center bg-gray-50 h-28 dark:bg-gray-800 rounded">
+              <p className="text-2xl text-gray-400 dark:text-gray-500">
+                Category 3
+              </p>
+            </div>
+            <div className="flex items-center justify-center bg-gray-50 h-28 dark:bg-gray-800 rounded">
+              <p className="text-2xl text-gray-400 dark:text-gray-500">
+                Category 4
+              </p>
+            </div>
           </div>
         </div>
       </div>
