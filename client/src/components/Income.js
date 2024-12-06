@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { jwtDecode } from "jwt-decode";
+import { HiOutlineCurrencyDollar } from "react-icons/hi2";
 
 const Income = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -205,17 +206,18 @@ const Income = () => {
       <div className="p-4">
         {/* Total Income Section */}
         <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="flex flex-col items-center justify-center w-[200px] h-[200px] min-w-[60px] min-h-[60px] sm:min-w-[40px] sm:min-h-[40px] aspect-square p-4 rounded-2xl bg-emerald-200 dark:bg-gray-800 shadow-lg sm:rounded-lg">
-            <div className="text-center sm:text-left">
-              <p className="text-md sm:text-lg text-gray-700 dark:text-gray-300">
-                Total Income
-              </p>
+          {/* Total Income */}
+          <div className="flex flex-col items-center justify-center bg-emerald-500 dark:bg-gray-800 border border-gray-300 rounded-xl w-full h-32 md:h-36 lg:h-40">
+            <div className="text-4xl text-white mb-4">
+              {/* You can use any icon from libraries like Font Awesome, Heroicons, etc. */}
+              <HiOutlineCurrencyDollar />
             </div>
-            <div className="mt-2 sm:mt-0 text-center">
-              <p className="text-lg sm:text-xl font-bold text-gray-700 dark:text-gray-300">
-                {monthName}: ${currentMonthIncome}
-              </p>
-            </div>
+            <p className="text-sm sm:text-md text-white dark:text-gray-300 uppercase">
+              Total Income
+            </p>
+            <p className="mt-2 text-md sm:text-lg font-bold text-white dark:text-gray-300">
+              ${currentMonthIncome}
+            </p>
           </div>
         </div>
 
