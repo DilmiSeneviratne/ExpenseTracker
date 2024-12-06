@@ -5,10 +5,11 @@ const mongoose = require("mongoose"); // Import mongoose
 
 // Add a new income
 router.post("/add", async (req, res) => {
-  const { userId, amount, category, date, description } = req.body;
+  const { userId, incomeName, amount, category, date, description } = req.body;
   try {
     const newIncome = new Income({
       userId,
+      incomeName,
       amount,
       category,
       date,
@@ -24,11 +25,11 @@ router.post("/add", async (req, res) => {
 // Update an income
 router.put("/update/:id", async (req, res) => {
   const { id } = req.params;
-  const { amount, category, date, description } = req.body;
+  const { incomeName, amount, category, date, description } = req.body;
   try {
     const updatedIncome = await Income.findByIdAndUpdate(
       id,
-      { amount, category, date, description },
+      { incomeName, amount, category, date, description },
       { new: true } // Return the updated document
     );
     if (!updatedIncome)
