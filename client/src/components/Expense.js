@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { jwtDecode } from "jwt-decode";
+import { TbCoins } from "react-icons/tb";
 
 const Expense = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -207,17 +208,18 @@ const Expense = () => {
       <div className="p-4">
         {/* Total Expense Section */}
         <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="flex flex-col items-center justify-center w-[200px] h-[200px] min-w-[60px] min-h-[60px] sm:min-w-[40px] sm:min-h-[40px] aspect-square p-4 rounded-2xl bg-emerald-200 dark:bg-gray-800 shadow-lg sm:rounded-lg">
-            <div className="text-center sm:text-left">
-              <p className="text-md sm:text-lg text-gray-700 dark:text-gray-300">
-                Total Expense
-              </p>
+          {/* Total Expense */}
+          <div className="flex flex-col items-center justify-center bg-emerald-500 dark:bg-gray-800 rounded-xl w-full h-32 md:h-36 lg:h-40">
+            <div className="text-4xl text-white mb-4">
+              {/* You can use any icon from libraries like Font Awesome, Heroicons, etc. */}
+              <TbCoins />
             </div>
-            <div className="mt-2 sm:mt-0 text-center">
-              <p className="text-lg sm:text-xl font-bold text-gray-700 dark:text-gray-300">
-                {monthName}: ${currentMonthExpense}
-              </p>
-            </div>
+            <p className="text-sm sm:text-md text-white dark:text-gray-300 uppercase">
+              Total Expense
+            </p>
+            <p className="mt-2 text-md sm:text-lg font-bold text-white dark:text-gray-300">
+              ${currentMonthExpense}
+            </p>
           </div>
         </div>
 
@@ -330,7 +332,7 @@ const Expense = () => {
                 required
                 className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md mb-4"
               />
-              
+
               <label
                 htmlFor="date"
                 className="block text-gray-700 dark:text-gray-300 mb-2"
