@@ -7,7 +7,7 @@ const incomeSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     }, // Reference to the user
-    incomeName: { type: String, required: false }, // New field
+    incomeName: { type: String, required: true }, // New field
     amount: { type: Number, required: true }, // Amount of income
     category: { type: String, required: true }, // Category of income
     date: { type: Date, required: true }, // Date of income
