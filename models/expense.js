@@ -7,7 +7,7 @@ const expenseSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     }, // Reference to the user
-    expenseName: { type: String, required: false }, // New field
+    expenseName: { type: String, required: true }, // New field
     amount: { type: Number, required: true }, // Amount of expense
     category: { type: String, required: true }, // Category of expense
     date: { type: Date, required: true }, // Date of expense

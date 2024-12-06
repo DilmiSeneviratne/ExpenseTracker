@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-import { Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
@@ -18,8 +17,7 @@ import { MdOutlineSavings } from "react-icons/md";
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
@@ -29,8 +27,8 @@ const Dashboard = () => {
   const [userId, setUserId] = useState("");
   const [totalIncome, setTotalIncome] = useState(0); // State to store total income
   const [totalExpense, setTotalExpense] = useState(0); // State to store total income
-  const [monthlyIncome, setMonthlyIncome] = useState([]);
-  const [monthlyExpenses, setMonthlyExpenses] = useState([]);
+  const [topExpenses, setTopExpenses] = useState([]);
+  const [topExpenseValues, setTopExpenseValues] = useState([]);
   const [labels, setLabels] = useState([]);
 
   // Get user ID from JWT token in localStorage
@@ -84,54 +82,64 @@ const Dashboard = () => {
     fetchTotalExpense(); // Call the function on component mount
   }, [userId]);
 
-  // Fetch monthly income and expenses
+  // Fetch Top 5 Expenses
   useEffect(() => {
-    const fetchMonthlyData = async () => {
+    const fetchTopExpenses = async () => {
       try {
-        const incomeResponse = await fetch(
-          `http://localhost:5000/api/income/monthly/${userId}`
+        const response = await fetch(
+          `http://localhost:5000/api/expense/top/current-month/${userId}`
         );
-        const expenseResponse = await fetch(
-          `http://localhost:5000/api/expense/monthly/${userId}`
-        );
-
-        if (!incomeResponse.ok || !expenseResponse.ok) {
-          throw new Error("Failed to fetch monthly data");
+        if (!response.ok) {
+          throw new Error("Failed to fetch top expenses");
         }
-
-        const incomeData = await incomeResponse.json();
-        console.log("Fetched Monthly Income:", incomeData);
-        const expenseData = await expenseResponse.json();
-
-        setLabels(incomeData.months); // Months array must be valid
-        setMonthlyIncome(incomeData.values); // Values array must be valid
-        setMonthlyExpenses(expenseData.values);
+        const data = await response.json();
+        setTopExpenses(data.categories); // Update categories
+        setTopExpenseValues(data.values); // Update expense values
       } catch (error) {
-        console.error("Error fetching monthly data:", error);
+        console.error("Error fetching top expenses:", error);
       }
     };
 
-    fetchMonthlyData();
+    if (userId) fetchTopExpenses();
   }, [userId]);
 
-  const chartOptions = {
+  // Bar Chart Data
+  const barChartData = {
+    labels: topExpenses || [],
+    datasets: [
+      {
+        label: "Top 5 Expenses",
+        data: topExpenseValues || [],
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.6)",
+          "rgba(54, 162, 235, 0.6)",
+          "rgba(255, 206, 86, 0.6)",
+          "rgba(75, 192, 192, 0.6)",
+          "rgba(153, 102, 255, 0.6)",
+        ],
+        borderColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const barChartOptions = {
     responsive: true,
     plugins: {
       legend: {
-        position: "top",
-        labels: {
-          font: {
-            family: "Roboto, sans-serif", // Matching the app's font
-            size: 16, // Increase the font size
-          },
-        },
+        display: false,
       },
       title: {
         display: true,
-        text: "Monthly Statistics",
+        text: "Top 5 Expenses - Current Month",
         font: {
-          family: "Roboto, sans-serif", // Matching the app's font
-          size: 18, // Increase the title font size
+          size: 18,
         },
       },
     },
@@ -139,45 +147,18 @@ const Dashboard = () => {
       x: {
         ticks: {
           font: {
-            family: "Roboto, sans-serif", // Matching the app's font
-            size: 14, // Increase the x-axis font size
+            size: 14,
           },
         },
       },
       y: {
         ticks: {
           font: {
-            family: "Roboto, sans-serif", // Matching the app's font
-            size: 14, // Increase the y-axis font size
+            size: 14,
           },
         },
       },
     },
-  };
-
-
-  const incomeData = {
-    labels: labels || [],
-    datasets: [
-      {
-        label: "Monthly Income",
-        data: monthlyIncome || [],
-        borderColor: "rgb(75, 192, 192)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-      },
-    ],
-  };
-
-  const expenseData = {
-    labels,
-    datasets: [
-      {
-        label: "Monthly Expenses",
-        data: monthlyExpenses,
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-      },
-    ],
   };
 
   return (
@@ -200,7 +181,7 @@ const Dashboard = () => {
           </div>
 
           {/* Total Expense */}
-          <div className="flex flex-col items-center justify-center bg-emerald-400 dark:bg-gray-800 rounded-xl w-full h-32 md:h-36 lg:h-40">
+          <div className="flex flex-col items-center justify-center bg-emerald-500 dark:bg-gray-800 rounded-xl w-full h-32 md:h-36 lg:h-40">
             <div className="text-4xl text-white mb-4">
               {/* You can use any icon from libraries like Font Awesome, Heroicons, etc. */}
               <TbCoins />
@@ -230,11 +211,8 @@ const Dashboard = () => {
 
         {/* Graph Section */}
         <div className="flex flex-wrap gap-4 items-center justify-center mb-10">
-          <div className="w-full md:w-[45%] max-w-[500px] bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl p-4">
-            <Line options={chartOptions} data={incomeData} />
-          </div>
-          <div className="w-full md:w-[45%] max-w-[500px] bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl p-4">
-            <Line options={chartOptions} data={expenseData} />
+          <div className="w-full md:w-[70%] max-w-[600px] bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl p-4">
+            <Bar options={barChartOptions} data={barChartData} />
           </div>
         </div>
 
