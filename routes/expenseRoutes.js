@@ -5,9 +5,9 @@ const mongoose = require("mongoose"); // Import mongoose
 
 // Add a new expense
 router.post('/add', async (req, res) => {
-    const { userId, amount, category, date, description } = req.body;
+    const { userId, expenseName, amount, category, date, description } = req.body;
     try {
-        const newExpense = new Expense({ userId, amount, category, date, description });
+        const newExpense = new Expense({ userId, expenseName, amount, category, date, description });
         const savedExpense = await newExpense.save();
         res.status(201).json(savedExpense);
     } catch (error) {
@@ -18,11 +18,11 @@ router.post('/add', async (req, res) => {
 // Update an expense
 router.put('/update/:id', async (req, res) => {
     const { id } = req.params;
-    const { amount, category, date, description } = req.body;
+    const { expenseName, amount, category, date, description } = req.body;
     try {
         const updatedExpense = await Expense.findByIdAndUpdate(
             id,
-            { amount, category, date, description },
+            { expenseName, amount, category, date, description },
             { new: true } // Return the updated document
         );
         if (!updatedExpense) return res.status(404).json({ message: 'Expense not found' });
@@ -136,6 +136,40 @@ router.get("/monthly/:userId", async (req, res) => {
   } catch (error) {
     console.error("Error fetching monthly expenses:", error);
     res.status(500).json({ error: "Failed to fetch monthly expenses" });
+  }
+});
+
+// Route to get the top 5 expenses for the current month
+router.get("/top/current-month/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Get the current month and year
+    const currentDate = new Date();
+    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+    // Query to fetch top 5 expenses for the user in the current month
+    const topExpenses = await Expense.find({
+      userId: userId,
+      date: {
+        $gte: firstDayOfMonth,
+        $lte: lastDayOfMonth,
+      },
+    })
+      .sort({ amount: -1 }) // Sort by amount in descending order
+      .limit(5); // Limit to top 5
+
+    res.status(200).json({
+      success: true,
+      data: topExpenses,
+    });
+  } catch (error) {
+    console.error("Error fetching top expenses:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching top expenses",
+    });
   }
 });
 
