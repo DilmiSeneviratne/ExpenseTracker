@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-import { Bar } from "react-chartjs-2";
+import { Bar, Doughnut, Line } from "react-chartjs-2";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,18 +10,27 @@ import {
   Title,
   Tooltip,
   Legend,
+  ArcElement, // Required for the Doughnut chart
+  LineElement,
+  PointElement,
 } from "chart.js";
 import { HiOutlineCurrencyDollar } from "react-icons/hi2";
 import { TbCoins } from "react-icons/tb";
 import { MdOutlineSavings } from "react-icons/md";
 
+
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ArcElement, // Required for creating doughnut/pie charts
+  ChartDataLabels
 );
 
 const Dashboard = () => {
@@ -30,6 +40,12 @@ const Dashboard = () => {
   const [topExpenses, setTopExpenses] = useState([]);
   const [topExpenseValues, setTopExpenseValues] = useState([]);
   const [labels, setLabels] = useState([]);
+  const [totalSavings, setTotalSavings] = useState(0);
+  const [dailyExpenses, setDailyExpenses] = useState({
+    dates: [],
+    amounts: [],
+  }); // Daily expenses data
+  const [username, setUsername] = useState("");
 
   // Get user ID from JWT token in localStorage
   useEffect(() => {
@@ -37,13 +53,16 @@ const Dashboard = () => {
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
+        console.log(decodedToken.username);
         setUserId(decodedToken.id);
+        setUsername(decodedToken.username)
       } catch (err) {
         console.error("Failed to decode token", err);
       }
     }
   }, []);
 
+  
   useEffect(() => {
     const fetchTotalIncome = async () => {
       try {
@@ -82,7 +101,6 @@ const Dashboard = () => {
     fetchTotalExpense(); // Call the function on component mount
   }, [userId]);
 
-  // Fetch Top 5 Expenses
   useEffect(() => {
     const fetchTopExpenses = async () => {
       try {
@@ -93,14 +111,75 @@ const Dashboard = () => {
           throw new Error("Failed to fetch top expenses");
         }
         const data = await response.json();
-        setTopExpenses(data.categories); // Update categories
-        setTopExpenseValues(data.values); // Update expense values
+
+        // Map categories and values from the response
+        const expenseName = data.data.map((expense) => expense.expenseName);
+        const values = data.data.map((expense) => expense.amount);
+
+        setTopExpenses(expenseName); // Update categories
+        setTopExpenseValues(values); // Update expense values
       } catch (error) {
         console.error("Error fetching top expenses:", error);
       }
     };
 
     if (userId) fetchTopExpenses();
+  }, [userId]);
+
+  // Calculate Savings
+  useEffect(() => {
+    setTotalSavings(totalIncome - totalExpense);
+  }, [totalIncome, totalExpense]);
+
+  // Donut Chart Data
+  const calculatePercentages = () => {
+    const total = totalIncome + totalExpense + totalSavings;
+    return [
+      ((totalIncome / total) * 100).toFixed(1), // Income %
+      ((totalExpense / total) * 100).toFixed(1), // Expense %
+      ((totalSavings / total) * 100).toFixed(1), // Savings %
+    ];
+  };
+
+  const percentages = calculatePercentages();
+
+  useEffect(() => {
+    const fetchDailyExpenses = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/expense/daily-expenses/${userId}`
+        );
+        const data = await response.json();
+
+        // Sort the data by date
+        const sortedData = {
+          dates: data.dates
+            .map((date) => new Date(date)) // Convert strings to Date objects
+            .sort((a, b) => a - b) // Sort the dates in ascending order
+            .map((date) => date.toISOString().split("T")[0]), // Convert back to string if necessary
+          amounts: [],
+        };
+
+        // Map amounts to the sorted dates
+        sortedData.amounts = sortedData.dates.map(
+          (sortedDate) =>
+            data.dates
+              .map((date, index) => ({
+                date: new Date(date),
+                amount: data.amounts[index],
+              }))
+              .find(
+                (item) => item.date.toISOString().split("T")[0] === sortedDate
+              )?.amount
+        );
+
+        setDailyExpenses(sortedData); // Update state with sorted data
+      } catch (error) {
+        console.error("Error fetching daily expenses:", error);
+      }
+    };
+
+    if (userId) fetchDailyExpenses();
   }, [userId]);
 
   // Bar Chart Data
@@ -110,20 +189,8 @@ const Dashboard = () => {
       {
         label: "Top 5 Expenses",
         data: topExpenseValues || [],
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.6)",
-          "rgba(54, 162, 235, 0.6)",
-          "rgba(255, 206, 86, 0.6)",
-          "rgba(75, 192, 192, 0.6)",
-          "rgba(153, 102, 255, 0.6)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-        ],
+        backgroundColor: "rgba(16, 185, 129)", // Emerald-500 with transparency
+        borderColor: "rgba(16, 185, 129)", // Emerald-500 solid border
         borderWidth: 1,
       },
     ],
@@ -131,15 +198,19 @@ const Dashboard = () => {
 
   const barChartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         display: false,
       },
       title: {
         display: true,
-        text: "Top 5 Expenses - Current Month",
+        text: "TOP 5 EXPENSES - CURRENT MONTH",
         font: {
+          family: "Roboto", // Custom font family
           size: 18,
+          weight: "normal", // Removed bold effect
+          colour: "black",
         },
       },
     },
@@ -148,6 +219,7 @@ const Dashboard = () => {
         ticks: {
           font: {
             size: 14,
+            colour: "black",
           },
         },
       },
@@ -155,8 +227,108 @@ const Dashboard = () => {
         ticks: {
           font: {
             size: 14,
+            colour: "black",
           },
         },
+      },
+    },
+    elements: {
+      bar: {
+        borderRadius: 10, // Rounded edges for bars
+      },
+    },
+  };
+
+  const doughnutChartData = {
+    labels: ["Income", "Expenses", "Savings"],
+    datasets: [
+      {
+        label: "Current Month",
+        data: [totalIncome, totalExpense, totalSavings],
+        backgroundColor: [
+          "rgb(34, 197, 94  )",
+          "rgb(16, 185, 129 )",
+          "rgb(59, 58, 56)",
+        ],
+        borderWidth: 2,
+      },
+    ],
+  };
+
+  const doughnutChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+      },
+      title: {
+        display: true,
+        text: "REPORT OVERVIEW",
+        font: {
+          family: "Roboto", // Custom font family
+          size: 18,
+          weight: "normal", // Removed bold effect
+          colour: "black",
+        },
+      },
+      datalabels: {
+        color: "white",
+        formatter: (value, context) => {
+          const percentages = calculatePercentages();
+          return percentages[context.dataIndex] + "%";
+        },
+        font: {
+          weight: "normal",
+          size: 12,
+        },
+      },
+    },
+  };
+
+  const lineChartData = {
+    labels: dailyExpenses.dates, // Dates on the x-axis
+    datasets: [
+      {
+        label: "Daily Expenses",
+        data: dailyExpenses.amounts,
+        borderColor: "rgb(16, 185, 129)",
+        backgroundColor: "rgb(16, 185, 129)",
+        fill: true,
+      },
+    ],
+  };
+
+  const lineChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+      },
+      title: {
+        display: true,
+        text: "DAILY EXPENSES FOR CURRENT MONTH",
+        font: {
+          family: "Roboto", // Custom font family
+          size: 18,
+          weight: "normal", // Removed bold effect
+          colour: "black",
+        },
+      },
+    },
+    datalabels: {
+      display: false, // Disable data labels for the Line Chart
+    },
+    scales: {
+      x: {
+        ticks: {
+          maxRotation: 45,
+          minRotation: 45,
+        },
+      },
+      y: {
+        beginAtZero: true,
       },
     },
   };
@@ -164,6 +336,12 @@ const Dashboard = () => {
   return (
     <>
       <div className="p-4">
+        {/* Header Section for Welcome Message */}
+        <div className="p-4 bg-white text-black dark:bg-gray-800 border-b border-gray-300 mb-6">
+          <h1 className="text-md sm:text-lg md:text-xl font-semibold uppercase">
+            Welcome, {username}
+          </h1>
+        </div>
         {/* Card Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {/* Total Income */}
@@ -209,39 +387,31 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Graph Section */}
-        <div className="flex flex-wrap gap-4 items-center justify-center mb-10">
-          <div className="w-full md:w-[70%] max-w-[600px] bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-xl p-4">
+        {/* Graphs Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* Bar Graph Section */}
+          <div
+            className="w-full relative md:col-span-2 bg-white dark:bg-gray-800 border border-gray-300 rounded-2xl p-4"
+            style={{ height: "300px" }} // Adjusted reduced height
+          >
             <Bar options={barChartOptions} data={barChartData} />
           </div>
-        </div>
 
-        {/* Categories Section */}
-        <div className="flex flex-col items-center gap-4">
-          <div className="text-2xl text-gray-400 dark:text-gray-500 mb-4">
-            Categories
+          {/* Donut Graph Section */}
+          <div
+            className="w-full relative md:col-span-1 bg-white dark:bg-gray-800 border border-gray-300 rounded-2xl p-4"
+            style={{ height: "300px" }} // Adjusted reduced height
+          >
+            <Doughnut data={doughnutChartData} options={doughnutChartOptions} />
           </div>
-          <div className="grid grid-cols-2 gap-4 w-full">
-            <div className="flex items-center justify-center bg-gray-50 h-28 dark:bg-gray-800 rounded">
-              <p className="text-2xl text-gray-400 dark:text-gray-500">
-                Category 1
-              </p>
-            </div>
-            <div className="flex items-center justify-center bg-gray-50 h-28 dark:bg-gray-800 rounded">
-              <p className="text-2xl text-gray-400 dark:text-gray-500">
-                Category 2
-              </p>
-            </div>
-            <div className="flex items-center justify-center bg-gray-50 h-28 dark:bg-gray-800 rounded">
-              <p className="text-2xl text-gray-400 dark:text-gray-500">
-                Category 3
-              </p>
-            </div>
-            <div className="flex items-center justify-center bg-gray-50 h-28 dark:bg-gray-800 rounded">
-              <p className="text-2xl text-gray-400 dark:text-gray-500">
-                Category 4
-              </p>
-            </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* Line Graph Section */}
+          <div
+            className="w-full relative md:col-span-3 bg-white dark:bg-gray-800 border border-gray-300 rounded-2xl p-4"
+            style={{ height: "300px" }}
+          >
+            <Line data={lineChartData} options={lineChartOptions} />
           </div>
         </div>
       </div>

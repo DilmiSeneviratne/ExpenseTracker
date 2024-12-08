@@ -34,6 +34,7 @@ router.post("/login", async (req, res) => {
   try {
     // Check if user exists
     const user = await User.findOne({ email });
+    console.log("User fetched from database:", user);
     if (!user) return res.status(400).json({ message: "User not found" });
 
     // Compare password with hashed password in DB
@@ -42,7 +43,7 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
 
     // Generate JWT token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id , username: user}, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
@@ -62,5 +63,6 @@ router.post("/logout", authMiddleware, (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 module.exports = router;

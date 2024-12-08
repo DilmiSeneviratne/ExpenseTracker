@@ -21,7 +21,7 @@ const Expense = () => {
     category: "",
     description: "",
   });
-
+const [username, setUsername] = useState("");
   // Get user ID from JWT token in localStorage
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -29,6 +29,7 @@ const Expense = () => {
       try {
         const decodedToken = jwtDecode(token);
         setUserId(decodedToken.id);
+        setUsername(decodedToken.username);
       } catch (err) {
         console.error("Failed to decode token", err);
       }
@@ -206,6 +207,12 @@ const Expense = () => {
   return (
     <>
       <div className="p-4">
+        {/* Header Section for Welcome Message */}
+        <div className="p-4 bg-white text-black dark:bg-gray-800 border-b border-gray-300 mb-6">
+          <h1 className="text-md sm:text-lg md:text-xl font-semibold uppercase">
+            Welcome, {username}
+          </h1>
+        </div>
         {/* Total Expense Section */}
         <div className="grid grid-cols-3 gap-4 mb-4">
           {/* Total Expense */}
@@ -376,8 +383,11 @@ const Expense = () => {
                 className="w-full p-2 border rounded-lg dark:bg-gray-600 dark:text-white"
               >
                 <option value="">Select Category</option>
-                <option value="salary">Salary</option>
-                <option value="freelance">Freelance</option>
+                <option value="salary">Home</option>
+                <option value="freelance">Pets</option>
+                <option value="freelance">Food</option>
+                <option value="freelance">Clothes</option>
+                <option value="freelance">Health</option>
               </select>
 
               <label

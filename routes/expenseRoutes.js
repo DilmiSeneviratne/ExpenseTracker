@@ -3,6 +3,7 @@ const router = express.Router();
 const Expense = require("../models/expense"); // Import expense model
 const mongoose = require("mongoose"); // Import mongoose
 
+
 // Add a new expense
 router.post('/add', async (req, res) => {
     const { userId, expenseName, amount, category, date, description } = req.body;
@@ -170,6 +171,43 @@ router.get("/top/current-month/:userId", async (req, res) => {
       success: false,
       message: "Error fetching top expenses",
     });
+  }
+});
+
+// Endpoint to fetch daily expenses for the current month
+router.get("/daily-expenses/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    // Query expenses for the given user within the current month's date range
+    const expenses = await Expense.find({
+      userId,
+      date: { $gte: startOfMonth, $lte: endOfMonth },
+    });
+
+    // Format data: Map dates to daily expenses
+    const dailyExpenses = {};
+    expenses.forEach((expense) => {
+      const dateKey = expense.date.toISOString().split("T")[0]; // Extract date in YYYY-MM-DD format
+      if (dailyExpenses[dateKey]) {
+        dailyExpenses[dateKey] += expense.amount;
+      } else {
+        dailyExpenses[dateKey] = expense.amount;
+      }
+    });
+
+    // Transform data into arrays
+    const dates = Object.keys(dailyExpenses);
+    const amounts = Object.values(dailyExpenses);
+
+    res.status(200).json({ dates, amounts });
+  } catch (error) {
+    console.error("Error fetching daily expenses:", error);
+    res.status(500).json({ error: "Failed to fetch daily expenses" });
   }
 });
 

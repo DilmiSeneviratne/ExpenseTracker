@@ -21,6 +21,7 @@ const Income = () => {
     category: "",
     description: "",
   });
+  const [username, setUsername] = useState("");
 
   // Get user ID from JWT token in localStorage
   useEffect(() => {
@@ -29,6 +30,7 @@ const Income = () => {
       try {
         const decodedToken = jwtDecode(token);
         setUserId(decodedToken.id);
+        setUsername(decodedToken.username);
       } catch (err) {
         console.error("Failed to decode token", err);
       }
@@ -204,6 +206,12 @@ const Income = () => {
   return (
     <>
       <div className="p-4">
+        {/* Header Section for Welcome Message */}
+        <div className="p-4 bg-white text-black dark:bg-gray-800 border-b border-gray-300 mb-6">
+          <h1 className="text-md sm:text-lg md:text-xl font-semibold uppercase">
+            Welcome, {username}
+          </h1>
+        </div>
         {/* Total Income Section */}
         <div className="grid grid-cols-3 gap-4 mb-4">
           {/* Total Income */}
