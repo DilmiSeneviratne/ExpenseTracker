@@ -9,6 +9,7 @@ import { ToastContainer, toast } from "react-toastify"; // Import Toastify
 import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
 import { useNavigate } from "react-router-dom";
 
+
 const Home = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
