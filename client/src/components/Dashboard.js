@@ -55,7 +55,7 @@ const Dashboard = () => {
         const decodedToken = jwtDecode(token);
         console.log(decodedToken.username);
         setUserId(decodedToken.id);
-        setUsername(decodedToken.username)
+        setUsername(decodedToken.user.username)
       } catch (err) {
         console.error("Failed to decode token", err);
       }
@@ -189,9 +189,11 @@ const Dashboard = () => {
       {
         label: "Top 5 Expenses",
         data: topExpenseValues || [],
-        backgroundColor: "rgba(16, 185, 129)", // Emerald-500 with transparency
-        borderColor: "rgba(16, 185, 129)", // Emerald-500 solid border
+        backgroundColor: "rgb(52, 211, 153)", 
+        borderColor: "rgb(52, 211, 153)", 
         borderWidth: 1,
+        barPercentage: 0.6, // Reduce bar width (50% of the category width)
+        categoryPercentage: 0.7, // Reduce category width (70% of total space)
       },
     ],
   };
@@ -213,6 +215,9 @@ const Dashboard = () => {
           colour: "black",
         },
       },
+      datalabels: {
+        display: false, // Explicitly disable datalabels for the bar chart
+      },
     },
     scales: {
       x: {
@@ -221,6 +226,10 @@ const Dashboard = () => {
             size: 14,
             colour: "black",
           },
+        },
+        
+        grid: {
+          display: false, // Removes vertical grid lines
         },
       },
       y: {
@@ -293,8 +302,10 @@ const Dashboard = () => {
         label: "Daily Expenses",
         data: dailyExpenses.amounts,
         borderColor: "rgb(16, 185, 129)",
-        backgroundColor: "rgb(16, 185, 129)",
+        backgroundColor: "rgba(16, 185, 129, 0.5)", // Added transparency for the fill effect
         fill: true,
+        pointRadius: 6, // Increased dot size
+        pointHoverRadius: 8, // Increased hover dot size
       },
     ],
   };
@@ -304,7 +315,7 @@ const Dashboard = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: true,
+        display: false,
       },
       title: {
         display: true,
@@ -313,12 +324,12 @@ const Dashboard = () => {
           family: "Roboto", // Custom font family
           size: 18,
           weight: "normal", // Removed bold effect
-          colour: "black",
+          color: "black", // Fixed spelling of color
         },
       },
-    },
-    datalabels: {
-      display: false, // Disable data labels for the Line Chart
+      datalabels: {
+        display: false, // Explicitly disable datalabels for the line chart
+      },
     },
     scales: {
       x: {
@@ -329,6 +340,12 @@ const Dashboard = () => {
       },
       y: {
         beginAtZero: true,
+      },
+    },
+    elements: {
+      point: {
+        radius: 6, // Increased default dot size
+        hoverRadius: 8, // Increased hover dot size
       },
     },
   };

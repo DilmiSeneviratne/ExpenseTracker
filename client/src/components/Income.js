@@ -30,7 +30,7 @@ const Income = () => {
       try {
         const decodedToken = jwtDecode(token);
         setUserId(decodedToken.id);
-        setUsername(decodedToken.username);
+        setUsername(decodedToken.user.username);
       } catch (err) {
         console.error("Failed to decode token", err);
       }
