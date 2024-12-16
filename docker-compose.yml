@@ -1,0 +1,43 @@
+#this file will define the services used in this application
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo-container
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-container
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    environment:
+      - MONGO_URL=mongodb+srv://dilmiseneviratne:94JqdrJBkl1n6EDB@clusterexpense.pqucj.mongodb.net/expenseDB?retryWrites=true&w=majority&appName=ClusterExpense
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: client-container
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./client:/app
+      - /client/node_modules
+
+volumes: 
+  mongo_data: {}
