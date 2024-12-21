@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { BiSolidEditAlt } from "react-icons/bi";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const Profile = ({ user = {} }) => {
+const Profile = () => {
   const [file, setFile] = useState(null);
-  const [profilePic, setProfilePic] = useState(user?.profilePicture || "");
+  const [profilePic, setProfilePic] = useState("");
+  const [userDetails, setUserDetails] = useState({
+    username: "",
+    email: "",
+  });
   const [userId, setUserId] = useState("");
 
+  // Fetch user ID from token
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        console.log(decodedToken); // Ensure token contains valid data
         setUserId(decodedToken.id);
       } catch (err) {
         console.error("Failed to decode token", err);
@@ -20,13 +27,35 @@ const Profile = ({ user = {} }) => {
     }
   }, []);
 
+  // Fetch user details
+  useEffect(() => {
+    if (userId) {
+      axios
+        .get(`http://localhost:5000/uploads/user/${userId}`)
+        .then((response) => {
+          const user = response.data.user;
+          setUserDetails({
+            username: user.username,
+            email: user.email,
+          });
+          setProfilePic(user.profilePicture || "");
+        })
+        .catch((error) => {
+          toast.error(
+            error.response?.data?.message || "Failed to fetch user details."
+          );
+          console.error("Error fetching user details:", error.message);
+        });
+    }
+  }, [userId]);
+
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
   const handleUpload = async () => {
     if (!file) {
-      alert("Please select a file to upload.");
+      toast.error("Please select a file to upload");
       return;
     }
 
@@ -35,16 +64,17 @@ const Profile = ({ user = {} }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:5000/upload-profile-picture/${userId}`,
+        `http://localhost:5000/uploads/upload-profile-picture/${userId}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
 
       setProfilePic(response.data.user.profilePicture);
-      alert("Profile picture uploaded successfully!");
+      toast.success("Profile picture uploaded Successfully");
     } catch (error) {
-      console.error("Error uploading file:", error);
-      alert("Failed to upload profile picture.");
+      toast.error(
+        error.response?.data?.message || "Failed to upload profile picture."
+      );
     }
   };
 
@@ -54,10 +84,9 @@ const Profile = ({ user = {} }) => {
         {/* Left Section: Profile Image */}
         <div className="w-1/3 flex flex-col items-center justify-center border-r border-emerald-200 pr-6">
           <div className="w-32 h-32 bg-emerald-100 rounded-full overflow-hidden mb-4">
-            {/* Profile Image Placeholder */}
             {profilePic ? (
               <img
-                src={`http://localhost:5000/${profilePic}`}
+                src={`http://localhost:5000/uploads/${profilePic}`}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
@@ -66,7 +95,9 @@ const Profile = ({ user = {} }) => {
             )}
           </div>
           <input type="file" onChange={handleFileChange} />
-          <button onClick={handleUpload}>Upload Profile Picture</button>
+          <button onClick={handleUpload}>
+            <BiSolidEditAlt />
+          </button>
         </div>
 
         {/* Right Section: Form */}
@@ -82,6 +113,10 @@ const Profile = ({ user = {} }) => {
             </label>
             <input
               type="text"
+              value={userDetails.username}
+              onChange={(e) =>
+                setUserDetails({ ...userDetails, username: e.target.value })
+              }
               placeholder="Enter your username"
               className="flex-1 px-4 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring focus:ring-emerald-200"
             />
@@ -94,11 +129,14 @@ const Profile = ({ user = {} }) => {
             </label>
             <input
               type="email"
+              value={userDetails.email}
+              onChange={(e) =>
+                setUserDetails({ ...userDetails, email: e.target.value })
+              }
               placeholder="Enter your email"
               className="flex-1 px-4 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring focus:ring-emerald-200"
             />
           </div>
-
           {/* Password Field */}
           <div className="flex items-center mb-4">
             <label className="w-1/3 text-md font-medium text-emerald-800">
@@ -125,7 +163,10 @@ const Profile = ({ user = {} }) => {
 
           {/* Save Changes Button */}
           <div className="flex justify-end">
-            <button className="bg-emerald-600 text-white py-2 px-6 rounded-2xl font-medium hover:bg-emerald-700 focus:outline-none focus:ring focus:ring-emerald-200">
+            <button
+              onClick={() => alert("Update functionality not yet implemented")}
+              className="bg-emerald-600 text-white py-2 px-6 rounded-2xl font-medium hover:bg-emerald-700 focus:outline-none focus:ring focus:ring-emerald-200"
+            >
               Save Changes
             </button>
           </div>

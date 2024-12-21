@@ -42,3 +42,4 @@ app.use("/api/auth", authRoutes); // Use "/api/auth" as the base route for authe
 app.use("/api/income", incomeRoutes); 
 app.use("/api/expense", expenseRoutes); 
 app.use("/uploads", profileRoutes);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
