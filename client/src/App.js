@@ -7,8 +7,10 @@ import Dashboard from "./components/Dashboard";
 import Income from "./components/Income";
 import Expense from "./components/Expense";
 import Profile from "./components/Profile";
+import TestimonialForm from "./components/TestimonialForm";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 
 function App() {
   return (
@@ -21,6 +23,7 @@ function App() {
           <Route path="income" element={<Income />} />
           <Route path="expense" element={<Expense />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="testimonialform" element={<TestimonialForm />} />
         </Route>
       </Routes>
       <ToastContainer position="top-right" autoClose={5000} />{" "}
