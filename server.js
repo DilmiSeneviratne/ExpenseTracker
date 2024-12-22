@@ -34,7 +34,7 @@ const authRoutes = require("./routes/authRoutes"); // Make sure this path is cor
 const incomeRoutes = require("./routes/incomeRoutes"); // Make sure this path is correct
 const expenseRoutes = require("./routes/expenseRoutes"); // Make sure this path is correct
 const profileRoutes = require("./routes/profileRoutes");
-
+const testimonialRoutes = require("./routes/testimonialRoutes");
 
 
 // Use Routes
@@ -43,3 +43,4 @@ app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes); 
 app.use("/uploads", profileRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api/testimonials", testimonialRoutes);
