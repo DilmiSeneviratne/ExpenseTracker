@@ -74,7 +74,7 @@ const Navbar = ({ handleLoginModalOpen }) => {
                   role="menuitem"
                   aria-haspopup="false"
                   className="flex items-center gap-2 py-4 transition-colors duration-300 hover:text-emerald-500 focus:text-emerald-600 focus:outline-none focus-visible:outline-none lg:px-8"
-                  href="javascript:void(0)"
+                  href="/"
                 >
                   <span>Home</span>
                 </a>

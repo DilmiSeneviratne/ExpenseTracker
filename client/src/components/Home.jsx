@@ -18,6 +18,8 @@ const Home = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate(); // Initialize the useNavigate hook
 
+  
+
   // Function to open the login modal
   const handleLoginModalOpen = () => {
     setIsLoginModalOpen(true);

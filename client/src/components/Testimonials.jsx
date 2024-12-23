@@ -1,6 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 
 const Testimonials = () => {
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch testimonials from backend
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/testimonials/all"); // Backend API endpoint
+        // Filter only positive testimonials based on sentiment score
+        const positiveTestimonials = response.data.filter((testimonial) => testimonial.sentimentScore > 0);
+        setTestimonials(positiveTestimonials);
+      } catch (err) {
+        setError("Failed to load testimonials.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
+
+  if (loading) {
+    return <p>Loading testimonials...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+
   return (
     <section id="testimonials" className="bg-white dark:bg-gray-900">
       <div className="container px-6 py-10 mx-auto">
@@ -15,39 +47,27 @@ const Testimonials = () => {
         </p>
 
         <div className="grid grid-cols-1 gap-8 mx-auto mt-8 lg:grid-cols-2 xl:mt-10 max-w-7xl">
-          <div className="p-6 bg-gray-100 rounded-lg dark:bg-gray-800 md:p-8">
-            <p className="leading-loose text-gray-500 dark:text-gray-300">
-              "This application has transformed the way I manage my expenses.
-              The intuitive dashboard and detailed reports have made tracking my
-              spending effortless!"
-            </p>
+          {testimonials.map((testimonial) => (
+            <div
+              key={testimonial._id}
+              className="p-6 bg-gray-100 rounded-lg dark:bg-gray-800 md:p-8"
+            >
+              <p className="leading-loose text-gray-500 dark:text-gray-300">
+                "{testimonial.message}"
+              </p>
 
-            <div className="flex items-center mt-6">
-              <div className="mx-4">
-                <h1 className="font-semibold text-emerald-500">Robbert</h1>
-                <span className="text-sm text-gray-500 dark:text-gray-300">
-                  CTO, Robert Consultancy
-                </span>
+              <div className="flex items-center mt-6">
+                <div className="mx-4">
+                  <h1 className="font-semibold text-emerald-500">
+                    {testimonial.name}
+                  </h1>
+                  <span className="text-sm text-gray-500 dark:text-gray-300">
+                    {testimonial.email}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="p-6 bg-gray-100 rounded-lg dark:bg-gray-800 md:p-8">
-            <p className="leading-loose text-gray-500 dark:text-gray-300">
-              "I love how secure and user-friendly the platform is. It’s the
-              perfect tool for managing personal and professional finances all
-              in one place!"
-            </p>
-
-            <div className="flex items-center mt-6">
-              <div className="mx-4">
-                <h1 className="font-semibold text-emerald-500">Mia Brown</h1>
-                <span className="text-sm text-gray-500 dark:text-gray-300">
-                  Marketing Manager at Stech
-                </span>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
