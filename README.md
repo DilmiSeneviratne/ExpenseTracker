@@ -1,23 +1,48 @@
-# ExpenseTracker
-Overview:
-A web application where users can track their daily income and expenses. Users will be able to add, edit, and delete entries for income and expenses, as well as view their balance and categorize their spending.
 
-Key Features:
+# Expenz - Expense Tracker
 
-User Authentication:
-Signup/Login: Basic user authentication using JWT (JSON Web Tokens).
-Profile: Users can manage their profile information (username, email, password).
+This project is an Expense Tracker web application designed to help users efficiently manage and track their personal finances. It provides a platform for users to monitor their incomes and expenses, categorize transactions, and view insightful financial reports, empowering them to take control of their financial health. The core functionality of the application revolves around the seamless addition, modification, and deletion of financial records, offering users an organized way to track their spending.
 
-Expense and Income Tracking:
-Add Income/Expense: Users can add entries specifying amounts, categories (e.g., food, travel, salary), and dates.
-Edit/Delete Entries: Modify or remove income or expense entries.
-Category Selection: Choose from predefined categories for easier analysis.
+The application features a user registration and login system that ensures secure access to personal data. Once logged in, users are greeted with a dynamic dashboard where they can view summaries of their financial activity, including monthly statistics and detailed reports. Users can also add and categorize their expenses and incomes, which allows them to better analyze their financial habits over time.
 
-Dashboard:
-Balance Overview: Display the user's current balance (income minus expenses).
-Summary: Show a summary of spending by category (e.g., total spent on food, transport, etc.).
-Recent Transactions: List of the most recent income and expense entries.
+In addition, the application includes a sentiment-based testimonials section where users can submit reviews of the platform. These testimonials are analyzed using sentiment analysis, with only positive reviews being displayed on the homepage. This ensures that users are exposed to positive feedback, encouraging further engagement with the platform.
 
-Date Filter:
-Monthly View: Users can view their income and expenses for a specific month or range of dates.
-Sort and Filter: Sort transactions by date, category, or amount.
+The application is designed with responsiveness in mind, ensuring a smooth experience across all devices, including desktops, tablets, and smartphones. This makes the platform accessible and user-friendly, regardless of the device being used.
+
+The project is built with a Node.js backend, MongoDB for data storage and React.js for frontend. It also leverages the Sentiment library for analyzing the sentiment of user-submitted testimonials, ensuring that only positive feedback is featured. With these technologies, the application delivers a robust and efficient solution for tracking and managing personal finances.
+
+
+## Run Locally
+
+Install dependencies
+
+```bash
+  npm install
+```
+
+Start the server
+
+```bash
+  npm start
+```
+
+Start the client
+
+```bash
+cd client
+  npm start
+```
+
+## Tech Stack
+
+**Client:** React, TailwindCSS
+
+**Server:** Node, Express
+
+**Database:** MongoDB 
+
+**Sentiment Analysis:** Sentiment Library 
+
+**Charts:** React Charts
+
+
