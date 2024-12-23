@@ -17,6 +17,11 @@ const testimonialSchema = new mongoose.Schema(
       required: true,
       maxlength: 500,
     },
+    sentimentScore: {
+      type: Number,
+      required: true,
+      default: 0, // Default neutral sentiment
+    },
     createdAt: {
       type: Date,
       default: Date.now,
