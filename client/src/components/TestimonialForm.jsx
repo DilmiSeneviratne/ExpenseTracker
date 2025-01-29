@@ -26,7 +26,7 @@ const TestimonialForm = () => {
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
       toast.error(
-              error.response?.data?.message || "Something went wrong, please try again."
+              error.response?.data?.message
             );
     }
   };

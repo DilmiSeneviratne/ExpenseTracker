@@ -379,7 +379,7 @@ const Expense = () => {
 
               <label
                 htmlFor="income-category"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                className="block text-gray-700 dark:text-gray-300 mb-2"
               >
                 Category
               </label>
@@ -390,11 +390,11 @@ const Expense = () => {
                 className="w-full p-2 border rounded-lg dark:bg-gray-600 dark:text-white"
               >
                 <option value="">Select Category</option>
-                <option value="salary">Home</option>
-                <option value="freelance">Pets</option>
-                <option value="freelance">Food</option>
-                <option value="freelance">Clothes</option>
-                <option value="freelance">Health</option>
+                <option value="Home">Home</option>
+                <option value="Pets">Pets</option>
+                <option value="Food">Food</option>
+                <option value="Clothes">Clothes</option>
+                <option value="Health">Health</option>
               </select>
 
               <label

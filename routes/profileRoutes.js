@@ -1,13 +1,15 @@
 const express = require("express");
 const multer = require("multer");
-const User = require("../models/user"); // Import User model
+const User = require("../models/user");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const userValidationSchema = require("../validations/userValidations");
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" }); // Temporary storage
 
+// Profile Picture Upload Route
 router.post(
   "/upload-profile-picture/:id",
   upload.single("profilePicture"),
@@ -18,11 +20,17 @@ router.post(
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const filePath = `uploads/${req.file.filename}`; // Use relative path
+    const filePath = `uploads/${req.file.filename}`;
     console.log(`File uploaded for user ${userId}: ${filePath}`);
 
     try {
-      // Save the file path to the user's record in the database
+      const { error } = userValidationSchema.validate({
+        profilePicture: filePath,
+      });
+      if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+      }
+
       const user = await User.findByIdAndUpdate(
         userId,
         { profilePicture: filePath },
@@ -43,10 +51,11 @@ router.post(
     }
   }
 );
+
 // Serve uploaded files statically
 router.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// API to fetch user details
+// Fetch User Details Route
 router.get("/user/:id", async (req, res) => {
   try {
     const userId = req.params.id;
@@ -72,22 +81,27 @@ router.put("/change-password/:userId", async (req, res) => {
     return res.status(400).json({ message: "All fields are required." });
   }
 
+  // Validate new password
+  const { error } = userValidationSchema.validate({ password: newPassword });
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
   try {
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Verify the current password
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Current password is incorrect." });
+      return res
+        .status(400)
+        .json({ message: "Current password is incorrect." });
     }
 
-    // Hash the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
-
     await user.save();
 
     res.json({ message: "Password updated successfully." });
@@ -97,9 +111,20 @@ router.put("/change-password/:userId", async (req, res) => {
   }
 });
 
+// Update Profile Route
 router.put("/update-profile/:userId", async (req, res) => {
   const { username, email } = req.body;
   const userId = req.params.userId;
+
+  // Validate username and email
+  const { error } = userValidationSchema.validate({
+    username,
+    email,
+    password: "temporary", // Skip password for profile update
+  });
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
 
   try {
     const user = await User.findById(userId);
@@ -111,22 +136,22 @@ router.put("/update-profile/:userId", async (req, res) => {
     user.email = email || user.email;
     await user.save();
 
-    // Generate a new JWT token with the updated user details
     const updatedToken = jwt.sign(
       { id: user._id, username: user.username, email: user.email },
-      process.env.JWT_SECRET, // Use the same secret key
-      { expiresIn: "1h" } // Optional expiration time
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
     );
 
     res.status(200).json({
       message: "Profile updated successfully",
-      token: updatedToken, // Send the new token in the response
+      token: updatedToken,
       user,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to update profile", error: error.message });
+    res.status(500).json({
+      message: "Failed to update profile",
+      error: error.message,
+    });
   }
 });
 

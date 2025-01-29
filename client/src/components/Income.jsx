@@ -22,7 +22,7 @@ const Income = () => {
     description: "",
   });
   const [username, setUsername] = useState("");
-  
+
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (token) {
@@ -216,6 +216,8 @@ const Income = () => {
     }
   };
 
+  const hasTotal = currentMonthIncome > 0;
+  const hasIncomes = incomes.length > 0;
 
   return (
     <>
@@ -231,9 +233,17 @@ const Income = () => {
             <p className="text-sm sm:text-md text-white dark:text-gray-300 uppercase">
               Total Income
             </p>
-            <p className="mt-2 text-md sm:text-lg font-bold text-white dark:text-gray-300">
-              ${currentMonthIncome}
-            </p>
+            {!hasTotal ? (
+              <div className="mt-2 text-md sm:text-lg font-base text-white dark:text-gray-300">
+                <p>No records for the current month.</p>
+              </div>
+            ) : (
+              <>
+                <p className="mt-2 text-md sm:text-lg font-bold text-white dark:text-gray-300">
+                  ${currentMonthIncome}
+                </p>
+              </>
+            )}
           </div>
         </div>
 
@@ -248,64 +258,73 @@ const Income = () => {
         </div>
 
         {/* Table Section */}
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-          <table className="w-full text-base text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-base text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  Income Name
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Date
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Amount
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Category
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Description
-                </th>
-                <th scope="col" className="px-6 py-3 text-center">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {incomes.map((income) => (
-                <tr
-                  key={income._id}
-                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                >
-                  <td className="px-6 py-4">{income.incomeName}</td>
-                  <td className="px-6 py-4">
-                    {new Date(income.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4">{income.amount}</td>
-                  <td className="px-6 py-4">{income.category}</td>
-                  <td className="px-6 py-4">{income.description}</td>
-                  <td className="px-6 py-4 text-2xl flex items-center justify-center space-x-4">
-                    <a
-                      href="#"
-                      className="text-green-500 hover:text-green-700"
-                      onClick={() => handleEdit(income)}
+        {!hasIncomes ? (
+          <div className="flex justify-center items-center text-gray-500 text-lg h-full">
+            <p>No records for income</p>
+          </div>
+        ) : (
+          <>
+            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+              <table className="w-full text-base text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead className="text-base text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                  <tr>
+                    <th scope="col" className="px-6 py-3">
+                      Income Name
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Date
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Amount
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Category
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Description
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-center">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {incomes.map((income) => (
+                    <tr
+                      key={income._id}
+                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                     >
-                      <BiSolidEditAlt />
-                    </a>
-                    <a
-                      href="#"
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => handleDelete(income._id)}
-                    >
-                      <RiDeleteBin6Line />
-                    </a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      <td className="px-6 py-4">{income.incomeName}</td>
+                      <td className="px-6 py-4">
+                        {new Date(income.date).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4">{income.amount}</td>
+                      <td className="px-6 py-4">{income.category}</td>
+                      <td className="px-6 py-4">{income.description}</td>
+                      <td className="px-6 py-4 text-2xl flex items-center justify-center space-x-4">
+                        <a
+                          href="#"
+                          className="text-green-500 hover:text-green-700"
+                          onClick={() => handleEdit(income)}
+                        >
+                          <BiSolidEditAlt />
+                        </a>
+                        <a
+                          href="#"
+                          className="text-red-500 hover:text-red-700"
+                          onClick={() => handleDelete(income._id)}
+                        >
+                          <RiDeleteBin6Line />
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Modal for adding or editing income */}

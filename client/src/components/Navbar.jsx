@@ -103,6 +103,7 @@ const Navbar = ({ handleLoginModalOpen }) => {
             </ul>
             <div className="flex items-center px-6 ml-auto lg:ml-0 lg:p-0">
               <button
+              id="getStarted"
                 data-modal-target="authentication-modal"
                 data-modal-toggle="authentication-modal"
                 onClick={handleLoginModalOpen}

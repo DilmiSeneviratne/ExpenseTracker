@@ -80,7 +80,15 @@ const Dashboard = () => {
       }
     };
 
-    fetchTotalIncome(); // Call the function on component mount
+    if (userId) {
+      fetchTotalIncome();
+    }
+
+    return () => {
+      // Cleanup function in case the component unmounts before the fetch is completed
+      setTotalIncome(0);
+    }; 
+
   }, [userId]);
 
   useEffect(() => {
@@ -99,7 +107,14 @@ const Dashboard = () => {
       }
     };
 
-    fetchTotalExpense(); // Call the function on component mount
+    if (userId) {
+      fetchTotalExpense();
+    }
+
+    return () => {
+      // Cleanup function in case the component unmounts before the fetch is completed
+      setTotalExpense(0);
+    }; 
   }, [userId]);
 
   useEffect(() => {
@@ -125,6 +140,12 @@ const Dashboard = () => {
     };
 
     if (userId) fetchTopExpenses();
+
+    return () => {
+      // Cleanup the totalExpense state if the component unmounts before fetch completion
+      setTopExpenses(0);
+    };
+
   }, [userId]);
 
   // Calculate Savings
@@ -142,7 +163,6 @@ const Dashboard = () => {
     ];
   };
 
-  const percentages = calculatePercentages();
 
   useEffect(() => {
     const fetchDailyExpenses = async () => {
@@ -181,6 +201,12 @@ const Dashboard = () => {
     };
 
     if (userId) fetchDailyExpenses();
+
+    return () => {
+      // Cleanup the totalExpense state if the component unmounts before fetch completion
+      setDailyExpenses(0);
+    }; 
+
   }, [userId]);
 
   // Bar Chart Data
@@ -351,82 +377,103 @@ const Dashboard = () => {
     },
   };
 
+  const hasRecords =
+    totalIncome > 0 ||
+    totalExpense > 0 ||
+    topExpenses.length > 0 ||
+    topExpenseValues.length > 0 ||
+    totalSavings > 0 ||
+    dailyExpenses.length >0;
+    ;
+
   return (
     <>
-      <div className="p-4">
-        {/* Card Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-          {/* Total Income */}
-          <div className="flex flex-col items-center justify-center bg-white dark:bg-gray-800 border border-gray-300 rounded-xl w-full h-32 md:h-36 lg:h-40">
-            <div className="text-4xl text-emerald-500 mb-4">
-              {/* You can use any icon from libraries like Font Awesome, Heroicons, etc. */}
-              <HiOutlineCurrencyDollar />
-            </div>
-            <p className="text-sm sm:text-md text-gray-700 dark:text-gray-300 uppercase">
-              Total Income
-            </p>
-            <p className="mt-2 text-md sm:text-lg font-bold text-gray-700 dark:text-gray-300">
-              ${totalIncome}
-            </p>
-          </div>
-
-          {/* Total Expense */}
-          <div className="flex flex-col items-center justify-center bg-emerald-500 dark:bg-gray-800 rounded-xl w-full h-32 md:h-36 lg:h-40">
-            <div className="text-4xl text-white mb-4">
-              {/* You can use any icon from libraries like Font Awesome, Heroicons, etc. */}
-              <TbCoins />
-            </div>
-            <p className="text-sm sm:text-md text-white dark:text-gray-300 uppercase">
-              Total Expense
-            </p>
-            <p className="mt-2 text-md sm:text-lg font-bold text-white dark:text-gray-300">
-              ${totalExpense}
-            </p>
-          </div>
-
-          {/* Total Profit */}
-          <div className="flex flex-col items-center justify-center bg-white dark:bg-gray-800 border border-gray-300 rounded-xl w-full h-32 md:h-36 lg:h-40">
-            <div className="text-4xl text-emerald-500 mb-4">
-              {/* You can use any icon from libraries like Font Awesome, Heroicons, etc. */}
-              <MdOutlineSavings />
-            </div>
-            <p className="text-sm sm:text-md text-gray-700 dark:text-gray-300 uppercase">
-              Total savings
-            </p>
-            <p className="mt-2 text-md sm:text-lg font-bold text-gray-700 dark:text-gray-300">
-              ${totalIncome - totalExpense}
-            </p>
-          </div>
+      {!hasRecords ? (
+        <div className="flex justify-center items-center text-gray-500 text-lg h-screen">
+          <p>No records for the current month.<br/>Please add income or expense</p>
         </div>
+      ) : (
+        <>
+          <div className="p-4 ">
+            {/* Card Section */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+              {/* Total Income */}
+              <div className="flex flex-col items-center justify-center bg-white dark:bg-gray-800 border border-gray-300 rounded-xl w-full h-32 md:h-36 lg:h-40">
+                <div className="text-4xl text-emerald-500 mb-4">
+                  {/* You can use any icon from libraries like Font Awesome, Heroicons, etc. */}
+                  <HiOutlineCurrencyDollar />
+                </div>
+                <p className="text-sm sm:text-md text-gray-700 dark:text-gray-300 uppercase">
+                  Total Income
+                </p>
+                <p className="mt-2 text-md sm:text-lg font-bold text-gray-700 dark:text-gray-300">
+                  ${totalIncome}
+                </p>
+              </div>
 
-        {/* Graphs Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          {/* Bar Graph Section */}
-          <div
-            className="w-full relative md:col-span-2 bg-white dark:bg-gray-800 border border-gray-300 rounded-2xl p-4"
-            style={{ height: "300px" }} // Adjusted reduced height
-          >
-            <Bar options={barChartOptions} data={barChartData} />
-          </div>
+              {/* Total Expense */}
+              <div className="flex flex-col items-center justify-center bg-emerald-500 dark:bg-gray-800 rounded-xl w-full h-32 md:h-36 lg:h-40">
+                <div className="text-4xl text-white mb-4">
+                  {/* You can use any icon from libraries like Font Awesome, Heroicons, etc. */}
+                  <TbCoins />
+                </div>
+                <p className="text-sm sm:text-md text-white dark:text-gray-300 uppercase">
+                  Total Expense
+                </p>
+                <p className="mt-2 text-md sm:text-lg font-bold text-white dark:text-gray-300">
+                  ${totalExpense}
+                </p>
+              </div>
 
-          {/* Donut Graph Section */}
-          <div
-            className="w-full relative md:col-span-1 bg-white dark:bg-gray-800 border border-gray-300 rounded-2xl p-4"
-            style={{ height: "300px" }} // Adjusted reduced height
-          >
-            <Doughnut data={doughnutChartData} options={doughnutChartOptions} />
+              {/* Total Savings */}
+              <div className="flex flex-col items-center justify-center bg-white dark:bg-gray-800 border border-gray-300 rounded-xl w-full h-32 md:h-36 lg:h-40">
+                <div className="text-4xl text-emerald-500 mb-4">
+                  {/* You can use any icon from libraries like Font Awesome, Heroicons, etc. */}
+                  <MdOutlineSavings />
+                </div>
+                <p className="text-sm sm:text-md text-gray-700 dark:text-gray-300 uppercase">
+                  Total Savings
+                </p>
+                <p className="mt-2 text-md sm:text-lg font-bold text-gray-700 dark:text-gray-300">
+                  ${totalIncome - totalExpense}
+                </p>
+              </div>
+            </div>
+
+            {/* Graphs Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {/* Bar Graph Section */}
+              <div
+                className="w-full relative md:col-span-2 bg-white dark:bg-gray-800 border border-gray-300 rounded-2xl p-4"
+                style={{ height: "300px" }} // Adjusted reduced height
+              >
+                <Bar options={barChartOptions} data={barChartData} />
+              </div>
+
+              {/* Donut Graph Section */}
+              <div
+                className="w-full relative md:col-span-1 bg-white dark:bg-gray-800 border border-gray-300 rounded-2xl p-4"
+                style={{ height: "300px" }} // Adjusted reduced height
+              >
+                <Doughnut
+                  data={doughnutChartData}
+                  options={doughnutChartOptions}
+                />
+              </div>
+            </div>
+
+            {/* Line Graph Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div
+                className="w-full relative md:col-span-3 bg-white dark:bg-gray-800 border border-gray-300 rounded-2xl p-4"
+                style={{ height: "300px" }}
+              >
+                <Line data={lineChartData} options={lineChartOptions} />
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          {/* Line Graph Section */}
-          <div
-            className="w-full relative md:col-span-3 bg-white dark:bg-gray-800 border border-gray-300 rounded-2xl p-4"
-            style={{ height: "300px" }}
-          >
-            <Line data={lineChartData} options={lineChartOptions} />
-          </div>
-        </div>
-      </div>
+        </>
+      )}
     </>
   );
 };
