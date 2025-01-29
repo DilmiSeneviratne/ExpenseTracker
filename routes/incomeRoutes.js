@@ -2,11 +2,19 @@ const express = require("express");
 const router = express.Router();
 const Income = require("../models/income"); // Import income model
 const mongoose = require("mongoose"); // Import mongoose
+const incomeValidationSchema = require("../validations/incomeValidations"); // Import validation schema
 
 // Add a new income
 router.post("/add", async (req, res) => {
-  const { userId, incomeName, amount, category, date, description } = req.body;
   try {
+    // Validate the request body
+    const { error } = incomeValidationSchema.validate(req.body);
+    if (error)
+      return res.status(400).json({ message: error.details[0].message });
+
+    const { userId, incomeName, amount, category, date, description } =
+      req.body;
+
     const newIncome = new Income({
       userId,
       incomeName,
@@ -15,6 +23,7 @@ router.post("/add", async (req, res) => {
       date,
       description,
     });
+
     const savedIncome = await newIncome.save();
     res.status(201).json(savedIncome);
   } catch (error) {
@@ -24,16 +33,25 @@ router.post("/add", async (req, res) => {
 
 // Update an income
 router.put("/update/:id", async (req, res) => {
-  const { id } = req.params;
-  const { incomeName, amount, category, date, description } = req.body;
   try {
+    const { id } = req.params;
+
+    // Validate the request body
+    const { error } = incomeValidationSchema.validate(req.body);
+    if (error)
+      return res.status(400).json({ message: error.details[0].message });
+
+    const { incomeName, amount, category, date, description } = req.body;
+
     const updatedIncome = await Income.findByIdAndUpdate(
       id,
       { incomeName, amount, category, date, description },
       { new: true } // Return the updated document
     );
+
     if (!updatedIncome)
       return res.status(404).json({ message: "Income not found" });
+
     res.status(200).json(updatedIncome);
   } catch (error) {
     res.status(500).json({ message: "Error updating income", error });
@@ -68,18 +86,26 @@ router.get("/all/:userId", async (req, res) => {
 router.get("/total/current-month/:userId", async (req, res) => {
   const { userId } = req.params;
   try {
-    // Get the first and last dates of the current month
-    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+    const startOfMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    );
+    const endOfMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth() + 1,
+      0
+    );
 
-    // Fetch incomes within the current month for the user
     const incomes = await Income.find({
       userId,
-      date: { $gte: startOfMonth, $lte: endOfMonth }, // Filter by date range
+      date: { $gte: startOfMonth, $lte: endOfMonth },
     });
 
-    // Calculate the total income
-    const totalIncome = incomes.reduce((total, income) => total + income.amount, 0);
+    const totalIncome = incomes.reduce(
+      (total, income) => total + income.amount,
+      0
+    );
 
     res.status(200).json({ totalIncome });
   } catch (error) {
@@ -94,7 +120,6 @@ router.get("/monthly/:userId", async (req, res) => {
   try {
     const currentYear = new Date().getFullYear();
 
-    // Aggregate income grouped by month for the current year
     const incomeData = await Income.aggregate([
       {
         $match: {
@@ -114,13 +139,11 @@ router.get("/monthly/:userId", async (req, res) => {
       { $sort: { "_id.month": 1 } },
     ]);
 
-    // Create an array of months (1-12) with default values of 0
     const months = Array.from({ length: 12 }, (_, i) => ({
       month: i + 1,
       totalIncome: 0,
     }));
 
-    // Merge the aggregated data with the months array
     incomeData.forEach((record) => {
       months[record._id.month - 1].totalIncome = record.totalIncome;
     });

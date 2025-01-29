@@ -1,92 +1,133 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Expense = require("../models/expense"); // Import expense model
-const mongoose = require("mongoose"); // Import mongoose
-
+const Expense = require("../models/expense");
+const mongoose = require("mongoose");
+const expenseValidationSchema = require("../validations/expenseValidations");
 
 // Add a new expense
-router.post('/add', async (req, res) => {
-    const { userId, expenseName, amount, category, date, description } = req.body;
-    try {
-        const newExpense = new Expense({ userId, expenseName, amount, category, date, description });
-        const savedExpense = await newExpense.save();
-        res.status(201).json(savedExpense);
-    } catch (error) {
-        res.status(500).json({ message: 'Error adding expense', error });
+router.post("/add", async (req, res) => {
+  try {
+    // Validate request body
+    const { error, value } = expenseValidationSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
     }
+
+    // Destructure validated data
+    const { userId, expenseName, amount, category, date, description } = value;
+
+    const newExpense = new Expense({
+      userId,
+      expenseName,
+      amount,
+      category,
+      date,
+      description,
+    });
+    const savedExpense = await newExpense.save();
+    res.status(201).json(savedExpense);
+  } catch (error) {
+    console.error("Error adding expense:", error);
+    res.status(500).json({ message: "Error adding expense", error });
+  }
 });
 
 // Update an expense
-router.put('/update/:id', async (req, res) => {
+router.put("/update/:id", async (req, res) => {
+  try {
     const { id } = req.params;
-    const { expenseName, amount, category, date, description } = req.body;
-    try {
-        const updatedExpense = await Expense.findByIdAndUpdate(
-            id,
-            { expenseName, amount, category, date, description },
-            { new: true } // Return the updated document
-        );
-        if (!updatedExpense) return res.status(404).json({ message: 'Expense not found' });
-        res.status(200).json(updatedExpense);
-    } catch (error) {
-        res.status(500).json({ message: 'Error updating expense', error });
+
+    // Validate request body
+    const { error, value } = expenseValidationSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
     }
+
+    // Destructure validated data
+    const { expenseName, amount, category, date, description } = value;
+
+    const updatedExpense = await Expense.findByIdAndUpdate(
+      id,
+      { expenseName, amount, category, date, description },
+      { new: true }
+    );
+
+    if (!updatedExpense) {
+      return res.status(404).json({ message: "Expense not found" });
+    }
+
+    res.status(200).json(updatedExpense);
+  } catch (error) {
+    console.error("Error updating expense:", error);
+    res.status(500).json({ message: "Error updating expense", error });
+  }
 });
 
 // Delete an expense
-router.delete('/delete/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const deletedExpense = await Expense.findByIdAndDelete(id);
-        if (!deletedExpense) return res.status(404).json({ message: 'Expense not found' });
-        res.status(200).json({ message: 'Expense deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error deleting expense', error });
+router.delete("/delete/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedExpense = await Expense.findByIdAndDelete(id);
+    if (!deletedExpense) {
+      return res.status(404).json({ message: "Expense not found" });
     }
+    res.status(200).json({ message: "Expense deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting expense:", error);
+    res.status(500).json({ message: "Error deleting expense", error });
+  }
 });
 
 // Fetch all expenses for a user
-router.get('/all/:userId', async (req, res) => {
-    const { userId } = req.params;
-    try {
-        const expenses = await Expense.find({ userId }).sort({ date: -1 }); // Sort by date (newest first)
-        res.status(200).json(expenses);
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching expenses', error });
-    }
+router.get("/all/:userId", async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const expenses = await Expense.find({ userId }).sort({ date: -1 });
+    res.status(200).json(expenses);
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+    res.status(500).json({ message: "Error fetching expenses", error });
+  }
 });
 
-// Calculate total income for the current month
+// Calculate total expenses for the current month
 router.get("/total/current-month/:userId", async (req, res) => {
   const { userId } = req.params;
   try {
-    // Get the first and last dates of the current month
-    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+    const startOfMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    );
+    const endOfMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth() + 1,
+      0
+    );
 
-    // Fetch incomes within the current month for the user
     const expenses = await Expense.find({
       userId,
-      date: { $gte: startOfMonth, $lte: endOfMonth }, // Filter by date range
+      date: { $gte: startOfMonth, $lte: endOfMonth },
     });
 
-    // Calculate the total income
-    const totalExpense = expenses.reduce((total, expense) => total + expense.amount, 0);
+    const totalExpense = expenses.reduce(
+      (total, expense) => total + expense.amount,
+      0
+    );
 
     res.status(200).json({ totalExpense });
   } catch (error) {
+    console.error("Error calculating total expense:", error);
     res.status(500).json({ message: "Error calculating total expense", error });
   }
 });
 
-// Get Monthly Expenses
+// Get monthly expenses
 router.get("/monthly/:userId", async (req, res) => {
   const { userId } = req.params;
-
   try {
     const currentYear = new Date().getFullYear();
 
-    // Aggregate expenses grouped by month for the current year
     const expenseData = await Expense.aggregate([
       {
         $match: {
@@ -106,13 +147,11 @@ router.get("/monthly/:userId", async (req, res) => {
       { $sort: { "_id.month": 1 } },
     ]);
 
-    // Create an array of months (1-12) with default values of 0
     const months = Array.from({ length: 12 }, (_, i) => ({
       month: i + 1,
       totalExpense: 0,
     }));
 
-    // Merge the aggregated data with the months array
     expenseData.forEach((record) => {
       months[record._id.month - 1].totalExpense = record.totalExpense;
     });
@@ -143,64 +182,54 @@ router.get("/monthly/:userId", async (req, res) => {
 // Route to get the top 5 expenses for the current month
 router.get("/top/current-month/:userId", async (req, res) => {
   const { userId } = req.params;
-
   try {
-    // Get the current month and year
     const currentDate = new Date();
-    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+    const firstDayOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1
+    );
+    const lastDayOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    );
 
-    // Query to fetch top 5 expenses for the user in the current month
     const topExpenses = await Expense.find({
-      userId: userId,
-      date: {
-        $gte: firstDayOfMonth,
-        $lte: lastDayOfMonth,
-      },
+      userId,
+      date: { $gte: firstDayOfMonth, $lte: lastDayOfMonth },
     })
-      .sort({ amount: -1 }) // Sort by amount in descending order
-      .limit(5); // Limit to top 5
+      .sort({ amount: -1 })
+      .limit(5);
 
-    res.status(200).json({
-      success: true,
-      data: topExpenses,
-    });
+    res.status(200).json({ success: true, data: topExpenses });
   } catch (error) {
     console.error("Error fetching top expenses:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error fetching top expenses",
-    });
+    res
+      .status(500)
+      .json({ success: false, message: "Error fetching top expenses" });
   }
 });
 
 // Endpoint to fetch daily expenses for the current month
 router.get("/daily-expenses/:userId", async (req, res) => {
   const { userId } = req.params;
-
   try {
     const today = new Date();
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-    // Query expenses for the given user within the current month's date range
     const expenses = await Expense.find({
       userId,
       date: { $gte: startOfMonth, $lte: endOfMonth },
     });
 
-    // Format data: Map dates to daily expenses
     const dailyExpenses = {};
     expenses.forEach((expense) => {
-      const dateKey = expense.date.toISOString().split("T")[0]; // Extract date in YYYY-MM-DD format
-      if (dailyExpenses[dateKey]) {
-        dailyExpenses[dateKey] += expense.amount;
-      } else {
-        dailyExpenses[dateKey] = expense.amount;
-      }
+      const dateKey = expense.date.toISOString().split("T")[0];
+      dailyExpenses[dateKey] = (dailyExpenses[dateKey] || 0) + expense.amount;
     });
 
-    // Transform data into arrays
     const dates = Object.keys(dailyExpenses);
     const amounts = Object.values(dailyExpenses);
 

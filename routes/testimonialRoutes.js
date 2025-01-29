@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Testimonial = require("../models/Testimonial");
 const Sentiment = require("sentiment"); // Import sentiment library
+const testimonialValidationSchema = require("../validations/testimonialValidations"); // Import the validation schema
 
 const sentiment = new Sentiment();
 
@@ -10,8 +11,11 @@ router.post("/add", async (req, res) => {
   try {
     const { name, email, message } = req.body;
 
-    if (!name || !email || !message) {
-      return res.status(400).json({ error: "All fields are required." });
+    // Validate the request body using Joi schema
+    const { error } = testimonialValidationSchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
     }
 
     // Analyze sentiment of the message
@@ -39,8 +43,8 @@ router.get("/all", async (req, res) => {
   try {
     // Fetch only the first two positive testimonials based on sentiment score
     const testimonials = await Testimonial.find({ sentimentScore: { $gt: 0 } })
-      .sort({ createdAt: -1 })  // Sort by creation date (most recent first)
-      .limit(2);  // Limit the results to only the first two testimonials
+      .sort({ createdAt: -1 }) // Sort by creation date (most recent first)
+      .limit(2); // Limit the results to only the first two testimonials
 
     res.status(200).json(testimonials);
   } catch (error) {
@@ -49,4 +53,5 @@ router.get("/all", async (req, res) => {
     });
   }
 });
+
 module.exports = router;

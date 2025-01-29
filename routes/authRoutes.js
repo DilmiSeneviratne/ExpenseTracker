@@ -3,17 +3,29 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user"); // Import User model
 const authMiddleware = require("../middleware/authMiddleware"); // Import authentication middleware
+const userValidationSchema = require("../validations/userValidations"); // Import validation schema
 const router = express.Router();
 
 // Register Route
-router.post("/register",async (req, res) => {
+router.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
+
+  // Validate user input
+  const { error } = userValidationSchema.validate({
+    username,
+    email,
+    password,
+  });
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
 
   try {
     // Check if email already exists
     const existingUser = await User.findOne({ email });
-    if (existingUser)
+    if (existingUser) {
       return res.status(400).json({ message: "Email already in use" });
+    }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -32,23 +44,35 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Validate email and password (reusing the validation schema)
+    const { error } = userValidationSchema.validate({
+      username: "temp",
+      email,
+      password,
+    });
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     // Check if user exists
     const user = await User.findOne({ email });
-
-    if (!user) return res.status(400).json({ message: "User not found" });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
 
     // Compare password with hashed password in DB
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
+    if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
+    }
 
     // Generate JWT token
-    const token = jwt.sign({ id: user._id , user: user}, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id, user }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
     // Send back token to the client
-    res.json({ token,user });
+    res.json({ token, user });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -63,6 +87,5 @@ router.post("/logout", authMiddleware, (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 
 module.exports = router;

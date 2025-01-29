@@ -165,6 +165,7 @@ const Home = () => {
                     Sign in to our platform
                   </h3>
                   <button
+                  id="closeModelLogin"
                     type="button"
                     onClick={handleModalClose}
                     className="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -236,7 +237,6 @@ const Home = () => {
                     <div className="text-sm font-medium text-gray-500 dark:text-gray-300">
                       Not registered?{" "}
                       <a
-                        href="#"
                         onClick={handleSignUpModalOpen}
                         className="text-emerald-600 hover:underline dark:text-emerald-500"
                       >
@@ -251,7 +251,7 @@ const Home = () => {
         )}
         {/* Sign-Up Modal */}
         {isSignUpModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div id="signup-model" className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="relative p-4 w-full max-w-md">
               <div className="bg-white rounded-lg shadow dark:bg-gray-700">
                 <div className="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
@@ -259,6 +259,7 @@ const Home = () => {
                     Create your account
                   </h3>
                   <button
+                  id="closeModelSignup"
                     onClick={handleModalClose}
                     className="text-gray-400 hover:bg-gray-200 rounded-lg w-8 h-8 flex items-center justify-center dark:hover:bg-gray-600"
                   >
